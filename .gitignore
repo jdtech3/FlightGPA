@@ -1,0 +1,15 @@
+# Quartus working files
+*.qws
+**/db/
+**/incremental_db/
+
+# Quartus output files
+**/output_files/
+
+# Backup files
+*.bak
+
+# ModelSim working files
+**/work/
+**/simulation/
+vsim.wlf
