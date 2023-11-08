@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<system name="$${FILENAME}">
+ <component
+   name="$${FILENAME}"
+   displayName="$${FILENAME}"
+   version="1.0"
+   description=""
+   tags=""
+   categories="System" />
+ <parameter name="bonusData"><![CDATA[bonusData 
+{
+   element main_pll
+   {
+      datum _sortIndex
+      {
+         value = "0";
+         type = "int";
+      }
+   }
+   element sdram_controller
+   {
+      datum _sortIndex
+      {
+         value = "2";
+         type = "int";
+      }
+   }
+   element vga_controller
+   {
+      datum _sortIndex
+      {
+         value = "6";
+         type = "int";
+      }
+   }
+   element vga_fifo
+   {
+      datum _sortIndex
+      {
+         value = "5";
+         type = "int";
+      }
+   }
+   element vga_pixel_buffer_dma
+   {
+      datum _sortIndex
+      {
+         value = "3";
+         type = "int";
+      }
+   }
+   element vga_pll
+   {
+      datum _sortIndex
+      {
+         value = "1";
+         type = "int";
+      }
+   }
+   element vga_rgb_resampler
+   {
+      datum _sortIndex
+      {
+         value = "4";
+         type = "int";
+      }
+   }
+}
+]]></parameter>
+ <parameter name="clockCrossingAdapter" value="HANDSHAKE" />
+ <parameter name="device" value="5CSEMA5F31C6" />
+ <parameter name="deviceFamily" value="Cyclone V" />
+ <parameter name="deviceSpeedGrade" value="6" />
+ <parameter name="fabricMode" value="QSYS" />
+ <parameter name="generateLegacySim" value="false" />
+ <parameter name="generationId" value="0" />
+ <parameter name="globalResetBus" value="false" />
+ <parameter name="hdlLanguage" value="VERILOG" />
+ <parameter name="hideFromIPCatalog" value="false" />
+ <parameter name="lockedInterfaceDefinition" value="" />
+ <parameter name="maxAdditionalLatency" value="1" />
+ <parameter name="projectName" value="FlightGPA.qpf" />
+ <parameter name="sopcBorderPoints" value="false" />
+ <parameter name="systemHash" value="0" />
+ <parameter name="testBenchDutName" value="" />
+ <parameter name="timeStamp" value="0" />
+ <parameter name="useTestBenchNamingPattern" value="false" />
+ <instanceScript></instanceScript>
+ <interface
+   name="sdram"
+   internal="sdram_controller.wire"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="sdram_clk"
+   internal="main_pll.sdram_clk"
+   type="clock"
+   dir="start" />
+ <interface name="sys_ref_clk" internal="main_pll.ref_clk" type="clock" dir="end" />
+ <interface
+   name="sys_ref_reset"
+   internal="main_pll.ref_reset"
+   type="reset"
+   dir="end" />
+ <interface
+   name="vga"
+   internal="vga_controller.external_interface"
+   type="conduit"
+   dir="end" />
+ <interface name="vga_ref_clk" internal="vga_pll.ref_clk" type="clock" dir="end" />
+ <interface
+   name="vga_ref_reset"
+   internal="vga_pll.ref_reset"
+   type="reset"
+   dir="end" />
+ <module
+   name="main_pll"
+   kind="altera_up_avalon_sys_sdram_pll"
+   version="18.0"
+   enabled="1">
+  <parameter name="AUTO_DEVICE" value="5CSEMA5F31C6" />
+  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="6" />
+  <parameter name="CIII_boards" value="DE0" />
+  <parameter name="CIV_boards" value="DE2-115" />
+  <parameter name="CV_boards" value="DE1-SoC" />
+  <parameter name="MAX10_boards" value="DE10-Lite" />
+  <parameter name="device_family" value="Cyclone V" />
+  <parameter name="gui_outclk" value="50.0" />
+  <parameter name="gui_refclk" value="50.0" />
+  <parameter name="other_boards" value="None" />
+ </module>
+ <module
+   name="sdram_controller"
+   kind="altera_avalon_new_sdram_controller"
+   version="18.1"
+   enabled="1">
+  <parameter name="TAC" value="5.5" />
+  <parameter name="TMRD" value="3" />
+  <parameter name="TRCD" value="20.0" />
+  <parameter name="TRFC" value="70.0" />
+  <parameter name="TRP" value="20.0" />
+  <parameter name="TWR" value="14.0" />
+  <parameter name="casLatency" value="3" />
+  <parameter name="clockRate" value="50000000" />
+  <parameter name="columnWidth" value="10" />
+  <parameter name="componentName">$${FILENAME}_sdram_controller</parameter>
+  <parameter name="dataWidth" value="16" />
+  <parameter name="generateSimulationModel" value="true" />
+  <parameter name="initNOPDelay" value="0.0" />
+  <parameter name="initRefreshCommands" value="2" />
+  <parameter name="masteredTristateBridgeSlave" value="0" />
+  <parameter name="model">single_Micron_MT48LC4M32B2_7_chip</parameter>
+  <parameter name="numberOfBanks" value="4" />
+  <parameter name="numberOfChipSelects" value="1" />
+  <parameter name="pinsSharedViaTriState" value="false" />
+  <parameter name="powerUpDelay" value="100.0" />
+  <parameter name="refreshPeriod" value="15.625" />
+  <parameter name="registerDataIn" value="true" />
+  <parameter name="rowWidth" value="13" />
+ </module>
+ <module
+   name="vga_controller"
+   kind="altera_up_avalon_video_vga_controller"
+   version="18.0"
+   enabled="1">
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="25000000" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
+  <parameter name="board" value="DE1-SoC" />
+  <parameter name="device" value="VGA Connector" />
+  <parameter name="resolution" value="VGA 640x480" />
+  <parameter name="underflow_flag" value="false" />
+ </module>
+ <module
+   name="vga_fifo"
+   kind="altera_up_avalon_video_dual_clock_buffer"
+   version="18.0"
+   enabled="1">
+  <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE" value="50000000" />
+  <parameter name="AUTO_CLOCK_STREAM_OUT_CLOCK_RATE" value="25000000" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
+  <parameter name="color_bits" value="10" />
+  <parameter name="color_planes" value="3" />
+ </module>
+ <module
+   name="vga_pixel_buffer_dma"
+   kind="altera_up_avalon_video_pixel_buffer_dma"
+   version="18.0"
+   enabled="1">
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="50000000" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
+  <parameter name="addr_mode" value="Consecutive" />
+  <parameter name="back_start_address" value="0" />
+  <parameter name="color_space" value="8-bit RGB" />
+  <parameter name="image_height" value="480" />
+  <parameter name="image_width" value="640" />
+  <parameter name="start_address" value="0" />
+ </module>
+ <module
+   name="vga_pll"
+   kind="altera_up_avalon_video_pll"
+   version="18.0"
+   enabled="1">
+  <parameter name="AUTO_DEVICE" value="5CSEMA5F31C6" />
+  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="6" />
+  <parameter name="camera">5MP Digital Camera (THDB_D5M)</parameter>
+  <parameter name="device_family" value="Cyclone V" />
+  <parameter name="gui_refclk" value="50.0" />
+  <parameter name="gui_resolution" value="VGA 640x480" />
+  <parameter name="lcd">7" LCD on VEEK-MT and MTL/MTL2 Modules</parameter>
+  <parameter name="lcd_clk_en" value="false" />
+  <parameter name="vga_clk_en" value="true" />
+  <parameter name="video_in_clk_en" value="false" />
+ </module>
+ <module
+   name="vga_rgb_resampler"
+   kind="altera_up_avalon_video_rgb_resampler"
+   version="18.0"
+   enabled="1">
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="50000000" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
+  <parameter name="alpha" value="1023" />
+  <parameter name="input_type" value="8-bit RGB" />
+  <parameter name="output_type" value="30-bit RGB" />
+ </module>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="vga_pixel_buffer_dma.avalon_pixel_dma_master"
+   end="sdram_controller.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon_streaming"
+   version="18.1"
+   start="vga_fifo.avalon_dc_buffer_source"
+   end="vga_controller.avalon_vga_sink" />
+ <connection
+   kind="avalon_streaming"
+   version="18.1"
+   start="vga_pixel_buffer_dma.avalon_pixel_source"
+   end="vga_rgb_resampler.avalon_rgb_sink" />
+ <connection
+   kind="avalon_streaming"
+   version="18.1"
+   start="vga_rgb_resampler.avalon_rgb_source"
+   end="vga_fifo.avalon_dc_buffer_sink" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="main_pll.sys_clk"
+   end="sdram_controller.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="main_pll.sys_clk"
+   end="vga_rgb_resampler.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="main_pll.sys_clk"
+   end="vga_pixel_buffer_dma.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="main_pll.sys_clk"
+   end="vga_fifo.clock_stream_in" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="vga_pll.vga_clk"
+   end="vga_controller.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="vga_pll.vga_clk"
+   end="vga_fifo.clock_stream_out" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="main_pll.reset_source"
+   end="sdram_controller.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="vga_pll.reset_source"
+   end="vga_controller.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="main_pll.reset_source"
+   end="vga_rgb_resampler.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="main_pll.reset_source"
+   end="vga_pixel_buffer_dma.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="main_pll.reset_source"
+   end="vga_fifo.reset_stream_in" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="vga_pll.reset_source"
+   end="vga_fifo.reset_stream_out" />
+ <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
+ <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />
+ <interconnectRequirement for="$system" name="qsys_mm.insertDefaultSlave" value="FALSE" />
+ <interconnectRequirement for="$system" name="qsys_mm.maxAdditionalLatency" value="1" />
+</system>
