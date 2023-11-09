@@ -9,6 +9,70 @@
    categories="System" />
  <parameter name="bonusData"><![CDATA[bonusData 
 {
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
    element main_pll
    {
       datum _sortIndex
@@ -17,7 +81,23 @@
          type = "int";
       }
    }
+   element pixel_fifo
+   {
+      datum _sortIndex
+      {
+         value = "5";
+         type = "int";
+      }
+   }
    element sdram_controller
+   {
+      datum _sortIndex
+      {
+         value = "3";
+         type = "int";
+      }
+   }
+   element sdram_interface
    {
       datum _sortIndex
       {
@@ -29,7 +109,7 @@
    {
       datum _sortIndex
       {
-         value = "6";
+         value = "8";
          type = "int";
       }
    }
@@ -37,7 +117,7 @@
    {
       datum _sortIndex
       {
-         value = "5";
+         value = "7";
          type = "int";
       }
    }
@@ -45,7 +125,7 @@
    {
       datum _sortIndex
       {
-         value = "3";
+         value = "4";
          type = "int";
       }
    }
@@ -61,7 +141,7 @@
    {
       datum _sortIndex
       {
-         value = "4";
+         value = "6";
          type = "int";
       }
    }
@@ -96,6 +176,11 @@
    internal="main_pll.sdram_clk"
    type="clock"
    dir="start" />
+ <interface
+   name="sdram_interface_color"
+   internal="sdram_interface.color"
+   type="conduit"
+   dir="end" />
  <interface name="sys_ref_clk" internal="main_pll.ref_clk" type="clock" dir="end" />
  <interface
    name="sys_ref_reset"
@@ -130,6 +215,17 @@
   <parameter name="other_boards" value="None" />
  </module>
  <module
+   name="pixel_fifo"
+   kind="altera_up_avalon_video_dual_clock_buffer"
+   version="18.0"
+   enabled="1">
+  <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE" value="50000000" />
+  <parameter name="AUTO_CLOCK_STREAM_OUT_CLOCK_RATE" value="50000000" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
+  <parameter name="color_bits" value="8" />
+  <parameter name="color_planes" value="1" />
+ </module>
+ <module
    name="sdram_controller"
    kind="altera_avalon_new_sdram_controller"
    version="18.1"
@@ -157,6 +253,18 @@
   <parameter name="refreshPeriod" value="15.625" />
   <parameter name="registerDataIn" value="true" />
   <parameter name="rowWidth" value="13" />
+ </module>
+ <module
+   name="sdram_interface"
+   kind="sdram_interface"
+   version="1.0"
+   enabled="1">
+  <parameter name="S_DONE" value="5" />
+  <parameter name="S_IDLE" value="0" />
+  <parameter name="S_POST_WRITE" value="4" />
+  <parameter name="S_PRETRANSFER" value="2" />
+  <parameter name="S_START" value="1" />
+  <parameter name="S_WRITE" value="3" />
  </module>
  <module
    name="vga_controller"
@@ -232,6 +340,20 @@
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
+   kind="avalon"
+   version="18.1"
+   start="sdram_interface.avm_m0"
+   end="sdram_controller.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon_streaming"
+   version="18.1"
+   start="pixel_fifo.avalon_dc_buffer_source"
+   end="vga_rgb_resampler.avalon_rgb_sink" />
+ <connection
    kind="avalon_streaming"
    version="18.1"
    start="vga_fifo.avalon_dc_buffer_source"
@@ -240,7 +362,7 @@
    kind="avalon_streaming"
    version="18.1"
    start="vga_pixel_buffer_dma.avalon_pixel_source"
-   end="vga_rgb_resampler.avalon_rgb_sink" />
+   end="pixel_fifo.avalon_dc_buffer_sink" />
  <connection
    kind="avalon_streaming"
    version="18.1"
@@ -265,7 +387,22 @@
    kind="clock"
    version="18.1"
    start="main_pll.sys_clk"
+   end="sdram_interface.clock" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="main_pll.sys_clk"
    end="vga_fifo.clock_stream_in" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="main_pll.sys_clk"
+   end="pixel_fifo.clock_stream_in" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="main_pll.sys_clk"
+   end="pixel_fifo.clock_stream_out" />
  <connection
    kind="clock"
    version="18.1"
@@ -300,12 +437,27 @@
    kind="reset"
    version="18.1"
    start="main_pll.reset_source"
+   end="sdram_interface.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="main_pll.reset_source"
    end="vga_fifo.reset_stream_in" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="main_pll.reset_source"
+   end="pixel_fifo.reset_stream_in" />
  <connection
    kind="reset"
    version="18.1"
    start="vga_pll.reset_source"
    end="vga_fifo.reset_stream_out" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="main_pll.reset_source"
+   end="pixel_fifo.reset_stream_out" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.insertDefaultSlave" value="FALSE" />
