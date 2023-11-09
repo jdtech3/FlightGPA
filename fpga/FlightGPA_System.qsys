@@ -97,14 +97,6 @@
          type = "int";
       }
    }
-   element pixel_fifo
-   {
-      datum _sortIndex
-      {
-         value = "5";
-         type = "int";
-      }
-   }
    element sdram_controller
    {
       datum _sortIndex
@@ -125,7 +117,7 @@
    {
       datum _sortIndex
       {
-         value = "8";
+         value = "7";
          type = "int";
       }
    }
@@ -133,7 +125,7 @@
    {
       datum _sortIndex
       {
-         value = "7";
+         value = "6";
          type = "int";
       }
    }
@@ -157,7 +149,7 @@
    {
       datum _sortIndex
       {
-         value = "6";
+         value = "5";
          type = "int";
       }
    }
@@ -229,17 +221,6 @@
   <parameter name="gui_outclk" value="150.0" />
   <parameter name="gui_refclk" value="50.0" />
   <parameter name="other_boards" value="None" />
- </module>
- <module
-   name="pixel_fifo"
-   kind="altera_up_avalon_video_dual_clock_buffer"
-   version="18.0"
-   enabled="1">
-  <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE" value="150000000" />
-  <parameter name="AUTO_CLOCK_STREAM_OUT_CLOCK_RATE" value="150000000" />
-  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
-  <parameter name="color_bits" value="8" />
-  <parameter name="color_planes" value="4" />
  </module>
  <module
    name="sdram_controller"
@@ -367,18 +348,13 @@
  <connection
    kind="avalon_streaming"
    version="18.1"
-   start="pixel_fifo.avalon_dc_buffer_source"
-   end="vga_rgb_resampler.avalon_rgb_sink" />
- <connection
-   kind="avalon_streaming"
-   version="18.1"
    start="vga_fifo.avalon_dc_buffer_source"
    end="vga_controller.avalon_vga_sink" />
  <connection
    kind="avalon_streaming"
    version="18.1"
    start="vga_pixel_buffer_dma.avalon_pixel_source"
-   end="pixel_fifo.avalon_dc_buffer_sink" />
+   end="vga_rgb_resampler.avalon_rgb_sink" />
  <connection
    kind="avalon_streaming"
    version="18.1"
@@ -409,16 +385,6 @@
    version="18.1"
    start="main_pll.sys_clk"
    end="vga_fifo.clock_stream_in" />
- <connection
-   kind="clock"
-   version="18.1"
-   start="main_pll.sys_clk"
-   end="pixel_fifo.clock_stream_in" />
- <connection
-   kind="clock"
-   version="18.1"
-   start="main_pll.sys_clk"
-   end="pixel_fifo.clock_stream_out" />
  <connection
    kind="clock"
    version="18.1"
@@ -462,18 +428,8 @@
  <connection
    kind="reset"
    version="18.1"
-   start="main_pll.reset_source"
-   end="pixel_fifo.reset_stream_in" />
- <connection
-   kind="reset"
-   version="18.1"
    start="vga_pll.reset_source"
    end="vga_fifo.reset_stream_out" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="main_pll.reset_source"
-   end="pixel_fifo.reset_stream_out" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.insertDefaultSlave" value="FALSE" />
