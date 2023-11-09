@@ -5,11 +5,11 @@
  version="1.0"
  fabric="QSYS">
  <!-- Format version 18.1 625 (Future versions may contain additional information.) -->
- <!-- 2023.11.09.10:15:53 -->
+ <!-- 2023.11.09.16:05:56 -->
  <!-- A collection of modules and connections -->
  <parameter name="AUTO_GENERATION_ID">
   <type>java.lang.Integer</type>
-  <value>1699542953</value>
+  <value>1699563956</value>
   <derived>false</derived>
   <enabled>true</enabled>
   <visible>false</visible>
@@ -1577,7 +1577,7 @@ the requested settings for a module instance. -->
    <type>java.math.BigInteger</type>
    <value>0</value>
    <derived>false</derived>
-   <enabled>true</enabled>
+   <enabled>false</enabled>
    <visible>true</visible>
    <valid>true</valid>
   </parameter>
@@ -1585,7 +1585,7 @@ the requested settings for a module instance. -->
    <type>java.math.BigInteger</type>
    <value>1</value>
    <derived>false</derived>
-   <enabled>true</enabled>
+   <enabled>false</enabled>
    <visible>true</visible>
    <valid>true</valid>
   </parameter>
@@ -1593,7 +1593,7 @@ the requested settings for a module instance. -->
    <type>java.math.BigInteger</type>
    <value>2</value>
    <derived>false</derived>
-   <enabled>true</enabled>
+   <enabled>false</enabled>
    <visible>true</visible>
    <valid>true</valid>
   </parameter>
@@ -1601,7 +1601,7 @@ the requested settings for a module instance. -->
    <type>java.math.BigInteger</type>
    <value>3</value>
    <derived>false</derived>
-   <enabled>true</enabled>
+   <enabled>false</enabled>
    <visible>true</visible>
    <valid>true</valid>
   </parameter>
@@ -1609,7 +1609,7 @@ the requested settings for a module instance. -->
    <type>java.math.BigInteger</type>
    <value>4</value>
    <derived>false</derived>
-   <enabled>true</enabled>
+   <enabled>false</enabled>
    <visible>true</visible>
    <valid>true</valid>
   </parameter>
@@ -1617,7 +1617,7 @@ the requested settings for a module instance. -->
    <type>java.math.BigInteger</type>
    <value>5</value>
    <derived>false</derived>
-   <enabled>true</enabled>
+   <enabled>false</enabled>
    <visible>true</visible>
    <valid>true</valid>
   </parameter>
@@ -5392,7 +5392,7 @@ parameters are a RESULT of the module parameters. -->
    end="sdram_controller.s1">
   <parameter name="arbitrationPriority">
    <type>int</type>
-   <value>1</value>
+   <value>64</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>

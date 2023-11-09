@@ -8,7 +8,7 @@ module sdram_interface (
 	output wire         avm_m0_write,         //       .write
 	output wire [31:0]  avm_m0_writedata,     //       .writedata
 	output wire [3:0]   avm_m0_byteenable,	   //	      .byteenable
-//	output wire         avm_m0_burstcount,	   //       .burstcount
+//	output wire [2:0]   avm_m0_burstcount,	   //       .burstcount
 	input  wire         clk,
 	input  wire         reset,
 	input       [31:0]  color
@@ -27,14 +27,16 @@ module sdram_interface (
 	wire write_buffer_full;
 	reg [3:0] write_current_state;
 	reg [3:0] write_next_state;
+	
+	reg [23:0] color_counter;
 
 	write_master #(
 		.DATAWIDTH(32), 
-		.BYTEENABLEWIDTH(4),
+		.BYTEENABLEWIDTH(4)
 //		.MAXBURSTCOUNT(64),
 //		.BURSTCOUNTWIDTH(7),
-		.FIFODEPTH(128),
-		.FIFODEPTH_LOG2(7)
+//		.FIFODEPTH(128),
+//		.FIFODEPTH_LOG2(7)
 	) writer (
 		.clk(clk),
 		.reset(reset),
@@ -46,7 +48,7 @@ module sdram_interface (
 		.control_done(write_done),
 		
 //		.user_buffer_data(color),
-		.user_buffer_data(32'hFFF1AB86),
+		.user_buffer_data({8'hFF, color_counter[23:0]}),
 		.user_write_buffer(write_write),
 		.user_buffer_full(write_buffer_full),
 		
@@ -79,16 +81,22 @@ module sdram_interface (
 			S_IDLE: 			write_next_state = S_START;
 			S_START: 		write_next_state = S_PRETRANSFER;
 			S_PRETRANSFER: write_next_state = S_WRITE;
-			S_WRITE: 		write_next_state = write_done ? S_DONE : S_POST_WRITE;
-			S_POST_WRITE: 	write_next_state = write_buffer_full ? S_POST_WRITE : S_WRITE;	// also stuck here if FIFO full
+			S_WRITE: 		write_next_state = S_POST_WRITE;
+			S_POST_WRITE: 	write_next_state = write_buffer_full ? S_POST_WRITE : 
+																					(write_done ? S_DONE : S_WRITE);	// also stuck here if FIFO full
 			S_DONE:			write_next_state = S_DONE;
 			default: 		write_next_state = S_IDLE;
 		endcase
 	end
 	
 	always @ (posedge clk) begin
-		if (reset) write_current_state <= S_IDLE;
+		if (reset) begin
+			write_current_state <= S_IDLE;
+			color_counter <= 0;
+		end
 		else write_current_state <= write_next_state;
+		
+		if (write_current_state == S_WRITE) color_counter <= color_counter + 54;
 	end
 	
 	always @ (*) begin
