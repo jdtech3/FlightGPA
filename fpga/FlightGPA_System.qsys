@@ -73,6 +73,22 @@
          type = "String";
       }
    }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
    element main_pll
    {
       datum _sortIndex
@@ -210,7 +226,7 @@
   <parameter name="CV_boards" value="DE1-SoC" />
   <parameter name="MAX10_boards" value="DE10-Lite" />
   <parameter name="device_family" value="Cyclone V" />
-  <parameter name="gui_outclk" value="50.0" />
+  <parameter name="gui_outclk" value="150.0" />
   <parameter name="gui_refclk" value="50.0" />
   <parameter name="other_boards" value="None" />
  </module>
@@ -219,11 +235,11 @@
    kind="altera_up_avalon_video_dual_clock_buffer"
    version="18.0"
    enabled="1">
-  <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE" value="50000000" />
-  <parameter name="AUTO_CLOCK_STREAM_OUT_CLOCK_RATE" value="50000000" />
+  <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE" value="150000000" />
+  <parameter name="AUTO_CLOCK_STREAM_OUT_CLOCK_RATE" value="150000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
   <parameter name="color_bits" value="8" />
-  <parameter name="color_planes" value="1" />
+  <parameter name="color_planes" value="4" />
  </module>
  <module
    name="sdram_controller"
@@ -237,7 +253,7 @@
   <parameter name="TRP" value="20.0" />
   <parameter name="TWR" value="14.0" />
   <parameter name="casLatency" value="3" />
-  <parameter name="clockRate" value="50000000" />
+  <parameter name="clockRate" value="150000000" />
   <parameter name="columnWidth" value="10" />
   <parameter name="componentName">$${FILENAME}_sdram_controller</parameter>
   <parameter name="dataWidth" value="16" />
@@ -283,7 +299,7 @@
    kind="altera_up_avalon_video_dual_clock_buffer"
    version="18.0"
    enabled="1">
-  <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE" value="50000000" />
+  <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE" value="150000000" />
   <parameter name="AUTO_CLOCK_STREAM_OUT_CLOCK_RATE" value="25000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
   <parameter name="color_bits" value="10" />
@@ -294,11 +310,11 @@
    kind="altera_up_avalon_video_pixel_buffer_dma"
    version="18.0"
    enabled="1">
-  <parameter name="AUTO_CLK_CLOCK_RATE" value="50000000" />
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="150000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
   <parameter name="addr_mode" value="Consecutive" />
   <parameter name="back_start_address" value="0" />
-  <parameter name="color_space" value="8-bit RGB" />
+  <parameter name="color_space" value="32-bit RGBA" />
   <parameter name="image_height" value="480" />
   <parameter name="image_width" value="640" />
   <parameter name="start_address" value="0" />
@@ -324,10 +340,10 @@
    kind="altera_up_avalon_video_rgb_resampler"
    version="18.0"
    enabled="1">
-  <parameter name="AUTO_CLK_CLOCK_RATE" value="50000000" />
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="150000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
   <parameter name="alpha" value="1023" />
-  <parameter name="input_type" value="8-bit RGB" />
+  <parameter name="input_type" value="32-bit RGBA" />
   <parameter name="output_type" value="30-bit RGB" />
  </module>
  <connection

@@ -1,17 +1,17 @@
 `timescale 1 ps / 1 ps
 module sdram_interface (
-	output wire [31:0] avm_m0_address,       // avm_m0.address
-	output wire        avm_m0_read,          //       .read
-	input  wire        avm_m0_waitrequest,   //       .waitrequest
-	input  wire [7:0]  avm_m0_readdata,      //       .readdata
-	input  wire        avm_m0_readdatavalid, //       .readdatavalid
-	output wire        avm_m0_write,         //       .write
-	output wire [7:0]  avm_m0_writedata,     //       .writedata
-	output wire        avm_m0_byteenable,	  //	     .byteenable
-//	output wire        avm_m0_burstcount,	  //       .burstcount
-	input  wire        clk,
-	input  wire        reset,
-	input       [7:0]  color
+	output wire [31:0]  avm_m0_address,       // avm_m0.address
+	output wire         avm_m0_read,          //       .read
+	input  wire         avm_m0_waitrequest,   //       .waitrequest
+	input  wire [31:0]  avm_m0_readdata,      //       .readdata
+	input  wire         avm_m0_readdatavalid, //       .readdatavalid
+	output wire         avm_m0_write,         //       .write
+	output wire [31:0]  avm_m0_writedata,     //       .writedata
+	output wire [3:0]   avm_m0_byteenable,	   //	      .byteenable
+//	output wire         avm_m0_burstcount,	   //       .burstcount
+	input  wire         clk,
+	input  wire         reset,
+	input       [31:0]  color
 );
 
 	parameter S_IDLE = 4'd0;
@@ -29,8 +29,8 @@ module sdram_interface (
 	reg [3:0] write_next_state;
 
 	write_master #(
-		.DATAWIDTH(8), 
-		.BYTEENABLEWIDTH(1),
+		.DATAWIDTH(32), 
+		.BYTEENABLEWIDTH(4),
 //		.MAXBURSTCOUNT(64),
 //		.BURSTCOUNTWIDTH(7),
 		.FIFODEPTH(128),
@@ -41,11 +41,12 @@ module sdram_interface (
 		
 		.control_fixed_location(1'b0),
 		.control_write_base(32'h00000000),
-		.control_write_length(32'd307200),
+		.control_write_length(32'd1228800),
 		.control_go(write_go),
 		.control_done(write_done),
 		
-		.user_buffer_data(color),
+//		.user_buffer_data(color),
+		.user_buffer_data(32'hFFF1AB86),
 		.user_write_buffer(write_write),
 		.user_buffer_full(write_buffer_full),
 		

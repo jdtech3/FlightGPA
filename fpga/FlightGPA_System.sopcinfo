@@ -5,11 +5,11 @@
  version="1.0"
  fabric="QSYS">
  <!-- Format version 18.1 625 (Future versions may contain additional information.) -->
- <!-- 2023.11.09.01:59:02 -->
+ <!-- 2023.11.09.02:33:52 -->
  <!-- A collection of modules and connections -->
  <parameter name="AUTO_GENERATION_ID">
   <type>java.lang.Integer</type>
-  <value>1699513142</value>
+  <value>1699515232</value>
   <derived>false</derived>
   <enabled>true</enabled>
   <visible>false</visible>
@@ -154,7 +154,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="gui_outclk">
    <type>double</type>
-   <value>50.0</value>
+   <value>150.0</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -162,7 +162,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="outclk">
    <type>double</type>
-   <value>50.0</value>
+   <value>150.0</value>
    <derived>true</derived>
    <enabled>false</enabled>
    <visible>false</visible>
@@ -363,7 +363,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="clockRate">
     <type>long</type>
-    <value>50000000</value>
+    <value>150000000</value>
     <derived>false</derived>
     <enabled>true</enabled>
     <visible>true</visible>
@@ -474,7 +474,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="clockRate">
     <type>long</type>
-    <value>50000000</value>
+    <value>150000000</value>
     <derived>false</derived>
     <enabled>true</enabled>
     <visible>true</visible>
@@ -608,7 +608,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="color_planes">
    <type>int</type>
-   <value>1</value>
+   <value>4</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -625,7 +625,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE">
    <type>java.lang.Long</type>
-   <value>50000000</value>
+   <value>150000000</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -635,7 +635,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="AUTO_CLOCK_STREAM_OUT_CLOCK_RATE">
    <type>java.lang.Long</type>
-   <value>50000000</value>
+   <value>150000000</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -706,7 +706,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="clockRate">
     <type>java.lang.Long</type>
-    <value>50000000</value>
+    <value>150000000</value>
     <derived>true</derived>
     <enabled>true</enabled>
     <visible>false</visible>
@@ -812,7 +812,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="clockRate">
     <type>java.lang.Long</type>
-    <value>50000000</value>
+    <value>150000000</value>
     <derived>true</derived>
     <enabled>true</enabled>
     <visible>false</visible>
@@ -969,7 +969,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="symbolsPerBeat">
     <type>int</type>
-    <value>1</value>
+    <value>4</value>
     <derived>false</derived>
     <enabled>true</enabled>
     <visible>false</visible>
@@ -1020,7 +1020,7 @@ parameters are a RESULT of the module parameters. -->
    <port>
     <name>stream_in_data</name>
     <direction>Input</direction>
-    <width>8</width>
+    <width>32</width>
     <role>data</role>
    </port>
   </interface>
@@ -1121,7 +1121,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="symbolsPerBeat">
     <type>int</type>
-    <value>1</value>
+    <value>4</value>
     <derived>false</derived>
     <enabled>true</enabled>
     <visible>false</visible>
@@ -1172,7 +1172,7 @@ parameters are a RESULT of the module parameters. -->
    <port>
     <name>stream_out_data</name>
     <direction>Output</direction>
-    <width>8</width>
+    <width>32</width>
     <role>data</role>
    </port>
   </interface>
@@ -1518,7 +1518,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="clockRate">
    <type>long</type>
-   <value>50000000</value>
+   <value>150000000</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -1621,7 +1621,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="clockRate">
     <type>java.lang.Long</type>
-    <value>50000000</value>
+    <value>150000000</value>
     <derived>true</derived>
     <enabled>true</enabled>
     <visible>false</visible>
@@ -2608,7 +2608,7 @@ parameters are a RESULT of the module parameters. -->
    <port>
     <name>avm_m0_readdata</name>
     <direction>Input</direction>
-    <width>8</width>
+    <width>32</width>
     <role>readdata</role>
    </port>
    <port>
@@ -2620,13 +2620,13 @@ parameters are a RESULT of the module parameters. -->
    <port>
     <name>avm_m0_writedata</name>
     <direction>Output</direction>
-    <width>8</width>
+    <width>32</width>
     <role>writedata</role>
    </port>
    <port>
     <name>avm_m0_byteenable</name>
     <direction>Output</direction>
-    <width>1</width>
+    <width>4</width>
     <role>byteenable</role>
    </port>
    <port>
@@ -2685,7 +2685,7 @@ parameters are a RESULT of the module parameters. -->
    <port>
     <name>color</name>
     <direction>Input</direction>
-    <width>8</width>
+    <width>32</width>
     <role>color</role>
    </port>
   </interface>
@@ -3142,7 +3142,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE">
    <type>java.lang.Long</type>
-   <value>50000000</value>
+   <value>150000000</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -3223,7 +3223,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="clockRate">
     <type>java.lang.Long</type>
-    <value>50000000</value>
+    <value>150000000</value>
     <derived>true</derived>
     <enabled>true</enabled>
     <visible>false</visible>
@@ -3743,7 +3743,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="color_space">
    <type>java.lang.String</type>
-   <value>8-bit RGB</value>
+   <value>32-bit RGBA</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -3760,7 +3760,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="AUTO_CLK_CLOCK_RATE">
    <type>java.lang.Long</type>
-   <value>50000000</value>
+   <value>150000000</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -3831,7 +3831,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="clockRate">
     <type>java.lang.Long</type>
-    <value>50000000</value>
+    <value>150000000</value>
     <derived>true</derived>
     <enabled>true</enabled>
     <visible>false</visible>
@@ -4186,7 +4186,7 @@ parameters are a RESULT of the module parameters. -->
    <port>
     <name>master_readdata</name>
     <direction>Input</direction>
-    <width>8</width>
+    <width>32</width>
     <role>readdata</role>
    </port>
    <memoryBlock>
@@ -4666,7 +4666,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="symbolsPerBeat">
     <type>int</type>
-    <value>1</value>
+    <value>4</value>
     <derived>false</derived>
     <enabled>true</enabled>
     <visible>false</visible>
@@ -4717,7 +4717,7 @@ parameters are a RESULT of the module parameters. -->
    <port>
     <name>stream_data</name>
     <direction>Output</direction>
-    <width>8</width>
+    <width>32</width>
     <role>data</role>
    </port>
   </interface>
@@ -5086,7 +5086,7 @@ parameters are a RESULT of the module parameters. -->
 the requested settings for a module instance. -->
   <parameter name="input_type">
    <type>java.lang.String</type>
-   <value>8-bit RGB</value>
+   <value>32-bit RGBA</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -5118,7 +5118,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="input_planes">
    <type>int</type>
-   <value>1</value>
+   <value>4</value>
    <derived>true</derived>
    <enabled>false</enabled>
    <visible>false</visible>
@@ -5151,7 +5151,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="AUTO_CLK_CLOCK_RATE">
    <type>java.lang.Long</type>
-   <value>50000000</value>
+   <value>150000000</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -5222,7 +5222,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="clockRate">
     <type>java.lang.Long</type>
-    <value>50000000</value>
+    <value>150000000</value>
     <derived>true</derived>
     <enabled>true</enabled>
     <visible>false</visible>
@@ -5376,7 +5376,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="symbolsPerBeat">
     <type>int</type>
-    <value>1</value>
+    <value>4</value>
     <derived>false</derived>
     <enabled>true</enabled>
     <visible>false</visible>
@@ -5427,7 +5427,7 @@ parameters are a RESULT of the module parameters. -->
    <port>
     <name>stream_in_data</name>
     <direction>Input</direction>
-    <width>8</width>
+    <width>32</width>
     <role>data</role>
    </port>
   </interface>

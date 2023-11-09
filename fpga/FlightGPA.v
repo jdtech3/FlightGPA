@@ -68,7 +68,7 @@ module FlightGPA (
 	// I/O
 	input		[3:0]		KEY;
 	input		[7:0]		SW;
-	output	[9:0]		LEDR;
+	output 	[9:0]		LEDR;
 	
 	// --- Instantiating the system ---
 	
