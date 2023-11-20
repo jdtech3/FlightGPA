@@ -6,7 +6,15 @@ module draw_triangle(
 	output wire [7:0] oX, oY,
 	output wire [2:0] oColour,
 	output wire oPlot,
-	output wire oDone
+	output wire oDone,
+
+	output wire gc_resetn,
+	output wire gc_enable,
+	output wire [7:0] gc_x_max,
+	output wire [7:0] gc_y_max,
+	input wire [7:0] gc_x,
+	input wire [7:0] gc_y,
+	input wire [7:0] gc_eog
 );
 
 	reg current_state, next_state;
@@ -30,17 +38,25 @@ module draw_triangle(
 	assign oColour = colour;
 	assign oPlot = plot_point & current_state == S_DRAW;
 	assign oDone = current_state == S_WAIT;
+
+	assign gc_resetn = resetn & (current_state == S_DRAW);
+	assign gc_enable = current_state == S_DRAW;
+	assign gc_x_max = x_range;
+	assign gc_y_max = y_range;
+	assign x_counter = gc_x;
+	assign y_counter = gc_y;
+	assign end_of_grid = gc_eog;
 	
-	grid_counter #(8) gc(
-		.clock			(clock),
-		.resetn			(resetn & (current_state == S_DRAW)),
-		.enable			(current_state == S_DRAW),
-		.x_max			(x_range),
-		.y_max			(y_range),
-		.x				(x_counter),
-		.y				(y_counter),
-		.end_of_grid	(end_of_grid)
-	);
+	// grid_counter #(8) gc(
+	// 	.clock			(clock),
+	// 	.resetn			(resetn & (current_state == S_DRAW)),
+	// 	.enable			(current_state == S_DRAW),
+	// 	.x_max			(x_range),
+	// 	.y_max			(y_range),
+	// 	.x				(x_counter),
+	// 	.y				(y_counter),
+	// 	.end_of_grid	(end_of_grid)
+	// );
 	
 	inside_triangle in_tri(
 		{8'd0,ax}, {8'd0,ay},

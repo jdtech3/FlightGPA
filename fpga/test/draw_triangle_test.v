@@ -16,6 +16,14 @@ module draw_triangle_test(
 	wire [2:0] colour;
 	wire [7:0] x, y;
 	wire plot;
+
+	wire gc_resetn;
+	wire gc_enable;
+	wire [7:0] gc_x_max;
+	wire [7:0] gc_y_max;
+	wire [7:0] gc_x;
+	wire [7:0] gc_y;
+	wire [7:0] gc_eog;
 	
 	vga_adapter vga(
 		.resetn(KEY[0]),
@@ -47,7 +55,26 @@ module draw_triangle_test(
 		.draw_en(~KEY[1]),
 		.oX(x), .oY(y),
 		.oColour(colour),
-		.oPlot(plot)
+		.oPlot(plot),
+
+		.gc_resetn(gc_resetn),
+		.gc_enable(gc_enable),
+		.gc_x_max(gc_x_max),
+		.gc_y_max(gc_y_max),
+		.gc_x(gc_x),
+		.gc_y(gc_y),
+		.gc_eog(gc_eog)
+	);
+
+	grid_counter #(8) gc(
+		.clock			(CLOCK_50),
+		.resetn			(gc_resetn),
+		.enable			(gc_enable),
+		.x_max			(gc_x_max),
+		.y_max			(gc_y_max),
+		.x				(gc_x),
+		.y				(gc_y),
+		.end_of_grid	(gc_eog)
 	);
 	
 endmodule
