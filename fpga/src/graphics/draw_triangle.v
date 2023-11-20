@@ -3,18 +3,15 @@ module draw_triangle(
 	ax, ay, bx, by, cx, cy,
 	colour,
 	draw_en,
-	oX, oY,
-	oColour,
-	oPlot,
-	oDone,
+	draw_done,
 
-	gc_resetn,
-	gc_enable,
-	gc_x_max,
-	gc_y_max,
-	gc_x,
-	gc_y,
-	gc_eog
+	screen_start,						// to interface
+	new_screen_colour,					// to interface
+	screen_x_min, screen_y_min,			// to interface
+	screen_x_range, screen_y_range,		// to interface
+	screen_x, screen_y,					// from interface
+	old_screen_colour,					// from interface
+	screen_done,						// from interface
 );
 
 	parameter WIDTH=8;
@@ -24,61 +21,46 @@ module draw_triangle(
 	input wire [WIDTH-1:0] ax, ay, bx, by, cx, cy;
 	input wire [COLOUR_WIDTH-1:0] colour;
 	input wire draw_en;
-	output wire [WIDTH-1:0] oX, oY;
-	output wire [COLOUR_WIDTH-1:0] oColour;
-	output wire oPlot;
-	output wire oDone;
-
-	output wire gc_resetn;
-	output wire gc_enable;
-	output wire [WIDTH-1:0] gc_x_max;
-	output wire [WIDTH-1:0] gc_y_max;
-	input wire [WIDTH-1:0] gc_x;
-	input wire [WIDTH-1:0] gc_y;
-	input wire gc_eog;
+	output wire draw_done;
+	
+	output wire screen_start;								// to interface
+	output wire [COLOUR_WIDTH-1:0] new_screen_colour;		// to interface
+	output wire [WIDTH-1:0] screen_x_min, screen_y_min;		// to interface
+	output wire [WIDTH-1:0] screen_x_range, screen_y_range;	// to interface
+	input wire [WIDTH-1:0] screen_x, screen_y;				// from interface
+	input wire [COLOUR_WIDTH-1:0] old_screen_colour;		// from interface
+	input wire screen_done;									// from interface
 
 	reg current_state, next_state;
-	wire [WIDTH-1:0] x_counter,y_counter;
-	wire end_of_grid;
-	wire [WIDTH-1:0] x_max, x_min, x_range, y_max, y_min, y_range;
+	wire [WIDTH-1:0] screen_x_max, screen_y_max;
 	wire plot_point;
 	
 	localparam
 		S_WAIT = 1'd0,
 		S_DRAW = 1'b1;
 	
-	max #(WIDTH) max_x(ax, bx, cx, x_max);
-	max #(WIDTH) max_y(ay, by, cy, y_max);
-	min #(WIDTH) min_x(ax, bx, cx, x_min);
-	min #(WIDTH) min_y(ay, by, cy, y_min);
-	assign x_range = x_max - x_min;
-	assign y_range = y_max - y_min;
-	assign oX = x_min + x_counter;
-	assign oY = y_min + y_counter;
-	assign oColour = colour;
-	assign oPlot = plot_point & current_state == S_DRAW;
-	assign oDone = current_state == S_WAIT;
-
-	assign gc_resetn = resetn & (current_state == S_DRAW);
-	assign gc_enable = current_state == S_DRAW;
-	assign gc_x_max = x_range;
-	assign gc_y_max = y_range;
-	assign x_counter = gc_x;
-	assign y_counter = gc_y;
-	assign end_of_grid = gc_eog;
+	max #(WIDTH) max_x(ax, bx, cx, screen_x_max);
+	max #(WIDTH) max_y(ay, by, cy, screen_y_max);
+	min #(WIDTH) min_x(ax, bx, cx, screen_x_min);
+	min #(WIDTH) min_y(ay, by, cy, screen_y_min);
+	assign screen_x_range = screen_x_max - screen_x_min;
+	assign screen_y_range = screen_y_max - screen_y_min;
+	assign new_screen_colour = plot_point ? colour : old_screen_colour;
+	assign screen_start = draw_en;
+	assign draw_done = screen_done;
 	
 	inside_triangle #(16) in_tri(
 		ax, ay,
 		bx, by,
 		cx, cy,
-		oX, oY,
+		screen_x, screen_y,
 		plot_point
 	);
 	
 	always @(*) begin
 		case(current_state)
 			S_WAIT: next_state <= draw_en ? S_DRAW : S_WAIT;
-			S_DRAW: next_state <= end_of_grid ? S_WAIT : S_DRAW;
+			S_DRAW: next_state <= draw_done ? S_WAIT : S_DRAW;
 		endcase
 	end
 	

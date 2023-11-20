@@ -12,39 +12,14 @@ module draw_triangle_test(
 	output [7:0] VGA_G,		//	VGA Green[9:0]
 	output [7:0] VGA_B  	//	VGA Blue[9:0]
 );
-	
-	wire [2:0] colour;
-	wire [7:0] x, y;
-	wire plot;
+	wire screen_start;
+	wire [2:0] new_screen_colour;
+	wire [7:0] screen_x_min, screen_y_min;
+	wire [7:0] screen_x_range, screen_y_range;
+	wire [7:0] screen_x, screen_y;
+	wire [2:0] old_screen_colour;
+	wire screen_done;
 
-	wire gc_resetn;
-	wire gc_enable;
-	wire [7:0] gc_x_max;
-	wire [7:0] gc_y_max;
-	wire [7:0] gc_x;
-	wire [7:0] gc_y;
-	wire gc_eog;
-	
-	vga_adapter vga(
-		.resetn(KEY[0]),
-		.clock(CLOCK_50),
-		.colour(colour),
-		.x(x), .y(y), .plot(plot),
-		.VGA_R(VGA_R),
-		.VGA_G(VGA_G),
-		.VGA_B(VGA_B),
-		.VGA_HS(VGA_HS),
-		.VGA_VS(VGA_VS),
-		.VGA_BLANK(VGA_BLANK_N),
-		.VGA_SYNC(VGA_SYNC_N),
-		.VGA_CLK(VGA_CLK)
-	);
-	
-	defparam vga.RESOLUTION = "320x240";
-	defparam vga.MONOCHROME = "FALSE";
-	defparam vga.BITS_PER_COLOUR_CHANNEL = 1;
-	defparam vga.BACKGROUND_IMAGE = "vga_adapter/black.mif";
-	
 	draw_triangle #(8,3) draw_tri(
 		.clock(CLOCK_50),
 		.resetn(KEY[0]),
@@ -53,28 +28,34 @@ module draw_triangle_test(
 		.cx(8'd0), .cy(8'd0),
 		.colour(3'b111),
 		.draw_en(~KEY[1]),
-		.oX(x), .oY(y),
-		.oColour(colour),
-		.oPlot(plot),
 
-		.gc_resetn(gc_resetn),
-		.gc_enable(gc_enable),
-		.gc_x_max(gc_x_max),
-		.gc_y_max(gc_y_max),
-		.gc_x(gc_x),
-		.gc_y(gc_y),
-		.gc_eog(gc_eog)
+		.screen_start(screen_start),
+		.new_screen_colour(new_screen_colour),
+		.screen_x_min(screen_x_min), .screen_y_min(screen_y_min),
+		.screen_x_range(screen_x_range), .screen_y_range(screen_y_range),
+		.screen_x(screen_x), .screen_y(screen_y),
+		.old_screen_colour(old_screen_colour),
+		.screen_done(screen_done)
 	);
 
-	grid_counter #(8) gc(
-		.clock			(CLOCK_50),
-		.resetn			(gc_resetn),
-		.enable			(gc_enable),
-		.x_max			(gc_x_max),
-		.y_max			(gc_y_max),
-		.x				(gc_x),
-		.y				(gc_y),
-		.end_of_grid	(gc_eog)
+	screen_writer #(8,3) sw(
+		.clock(CLOCK_50),
+		.resetn(KEY[0]),
+		.screen_start(screen_start),
+		.new_screen_colour(new_screen_colour),
+		.screen_x_min(screen_x_min), .screen_y_min(screen_y_min),
+		.screen_x_range(screen_x_range), .screen_y_range(screen_y_range),
+		.screen_x(screen_x), .screen_y(screen_y),
+		.old_screen_colour(old_screen_colour),
+		.screen_done(screen_done),
+		.VGA_CLK(VGA_CLK),
+		.VGA_HS(VGA_HS),
+		.VGA_VS(VGA_VS),
+		.VGA_BLANK_N(VGA_BLANK_N),
+		.VGA_SYNC_N(VGA_SYNC_N),
+		.VGA_R(VGA_R),
+		.VGA_G(VGA_G),
+		.VGA_B(VGA_B)
 	);
 	
 endmodule
@@ -82,13 +63,13 @@ endmodule
 module screen_writer(
 	clock,
 	resetn,
-	screen_start,						// from interface
-	new_screen_colour,					// from interface
-	screen_x_min, screen_y_min,			// from interface
-	screen_x_range, screen_y_range,		// from interface
-	screen_x, screen_y,					// to interface
-	old_screen_colour,					// to interface
-	screen_done,						// to interface
+	screen_start,						// from logic
+	new_screen_colour,					// from logic
+	screen_x_min, screen_y_min,			// from logic
+	screen_x_range, screen_y_range,		// from logic
+	screen_x, screen_y,					// to logic
+	old_screen_colour,					// to logic
+	screen_done,						// to logic
 	VGA_CLK,   		//	VGA Clock
 	VGA_HS,			//	VGA H_SYNC
 	VGA_VS,			//	VGA V_SYNC
@@ -104,13 +85,13 @@ module screen_writer(
 
 	input wire clock;
 	input wire resetn;
-	input wire screen_start;								// from interface
-	input wire [COLOUR_WIDTH-1:0] new_screen_colour;		// from interface
-	input wire [WIDTH-1:0] screen_x_min, screen_y_min;		// from interface
-	input wire [WIDTH-1:0] screen_x_range, screen_y_range;	// from interface
-	output wire [WIDTH-1:0] screen_x, screen_y;				// to interface
-	output wire [COLOUR_WIDTH-1:0] old_screen_colour;		// to interface
-	output wire screen_done;								// to interface
+	input wire screen_start;								// from logic
+	input wire [COLOUR_WIDTH-1:0] new_screen_colour;		// from logic
+	input wire [WIDTH-1:0] screen_x_min, screen_y_min;		// from logic
+	input wire [WIDTH-1:0] screen_x_range, screen_y_range;	// from logic
+	output wire [WIDTH-1:0] screen_x, screen_y;				// to logic
+	output wire [COLOUR_WIDTH-1:0] old_screen_colour;		// to logic
+	output wire screen_done;								// to logic
 	output wire VGA_CLK;   		//	VGA Clock
 	output wire VGA_HS;			//	VGA H_SYNC
 	output wire VGA_VS;			//	VGA V_SYNC
@@ -121,7 +102,7 @@ module screen_writer(
 	output wire [7:0] VGA_B;  	//	VGA Blue[9:0]
 
 	reg current_state, next_state;
-	wire [WIDTH-1:0] x_counter,y_counter;
+	wire [WIDTH-1:0] x_counter, y_counter;
 
 	localparam
 		S_WAIT = 1'd0,
@@ -131,7 +112,7 @@ module screen_writer(
 	assign screen_y = screen_y_min + y_counter;
 	assign old_screen_colour = 0;
 
-	grid_counter #(8) gc(
+	grid_counter #(WIDTH) gc(
 		.clock			(clock),
 		.resetn			(resetn & (current_state == S_DRAW)),
 		.enable			(current_state == S_DRAW),
@@ -171,8 +152,8 @@ module screen_writer(
 	end
 	
 	always @(posedge clock) begin
-		if(!resetn) current_state = S_WAIT;
-		else current_state = next_state;
+		if(!resetn) current_state <= S_WAIT;
+		else current_state <= next_state;
 	end
 
 endmodule
