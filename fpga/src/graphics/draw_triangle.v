@@ -1,36 +1,56 @@
 module draw_triangle(
-	input wire clock, resetn,
-	input wire [7:0] ax, ay, bx, by, cx, cy,
-	input wire [2:0] colour,
-	input wire draw_en,
-	output wire [7:0] oX, oY,
-	output wire [2:0] oColour,
-	output wire oPlot,
-	output wire oDone,
+	clock, resetn,
+	ax, ay, bx, by, cx, cy,
+	colour,
+	draw_en,
+	oX, oY,
+	oColour,
+	oPlot,
+	oDone,
 
-	output wire gc_resetn,
-	output wire gc_enable,
-	output wire [7:0] gc_x_max,
-	output wire [7:0] gc_y_max,
-	input wire [7:0] gc_x,
-	input wire [7:0] gc_y,
-	input wire [7:0] gc_eog
+	gc_resetn,
+	gc_enable,
+	gc_x_max,
+	gc_y_max,
+	gc_x,
+	gc_y,
+	gc_eog
 );
 
+	parameter WIDTH=8;
+	parameter COLOUR_WIDTH=3;
+
+	input wire clock, resetn;
+	input wire [WIDTH-1:0] ax, ay, bx, by, cx, cy;
+	input wire [COLOUR_WIDTH-1:0] colour;
+	input wire draw_en;
+	output wire [WIDTH-1:0] oX, oY;
+	output wire [COLOUR_WIDTH-1:0] oColour;
+	output wire oPlot;
+	output wire oDone;
+
+	output wire gc_resetn;
+	output wire gc_enable;
+	output wire [WIDTH-1:0] gc_x_max;
+	output wire [WIDTH-1:0] gc_y_max;
+	input wire [WIDTH-1:0] gc_x;
+	input wire [WIDTH-1:0] gc_y;
+	input wire gc_eog;
+
 	reg current_state, next_state;
-	wire [7:0] x_counter,y_counter;
+	wire [WIDTH-1:0] x_counter,y_counter;
 	wire end_of_grid;
-	wire [7:0] x_max, x_min, x_range, y_max, y_min, y_range;
+	wire [WIDTH-1:0] x_max, x_min, x_range, y_max, y_min, y_range;
 	wire plot_point;
 	
 	localparam
 		S_WAIT = 1'd0,
 		S_DRAW = 1'b1;
 	
-	max max_x(ax, bx, cx, x_max);
-	max max_y(ay, by, cy, y_max);
-	min min_x(ax, bx, cx, x_min);
-	min min_y(ay, by, cy, y_min);
+	max #(WIDTH) max_x(ax, bx, cx, x_max);
+	max #(WIDTH) max_y(ay, by, cy, y_max);
+	min #(WIDTH) min_x(ax, bx, cx, x_min);
+	min #(WIDTH) min_y(ay, by, cy, y_min);
 	assign x_range = x_max - x_min;
 	assign y_range = y_max - y_min;
 	assign oX = x_min + x_counter;
@@ -47,22 +67,11 @@ module draw_triangle(
 	assign y_counter = gc_y;
 	assign end_of_grid = gc_eog;
 	
-	// grid_counter #(8) gc(
-	// 	.clock			(clock),
-	// 	.resetn			(resetn & (current_state == S_DRAW)),
-	// 	.enable			(current_state == S_DRAW),
-	// 	.x_max			(x_range),
-	// 	.y_max			(y_range),
-	// 	.x				(x_counter),
-	// 	.y				(y_counter),
-	// 	.end_of_grid	(end_of_grid)
-	// );
-	
-	inside_triangle in_tri(
-		{8'd0,ax}, {8'd0,ay},
-		{8'd0,bx}, {8'd0,by},
-		{8'd0,cx}, {8'd0,cy},
-		{8'd0,oX}, {8'd0,oY},
+	inside_triangle #(16) in_tri(
+		ax, ay,
+		bx, by,
+		cx, cy,
+		oX, oY,
 		plot_point
 	);
 	
@@ -81,22 +90,28 @@ module draw_triangle(
 endmodule
 
 module inside_triangle(
-	input [15:0] ax, ay, bx, by, cx, cy, px, py,
-	output out
+	ax, ay, bx, by, cx, cy, px, py,
+	out
 );
+	parameter WIDTH=16;
+	input [WIDTH-1:0] ax, ay, bx, by, cx, cy, px, py;
+	output out;
 	wire o1, o2, o3;
-	same_side s1(ax, ay, bx, by, cx, cy, px, py, o1);
-	same_side s2(ax, ay, cx, cy, bx, by, px, py, o2);
-	same_side s3(bx, by, cx, cy, ax, ay, px, py, o3);
+	same_side #(WIDTH) s1(ax, ay, bx, by, cx, cy, px, py, o1);
+	same_side #(WIDTH) s2(ax, ay, cx, cy, bx, by, px, py, o2);
+	same_side #(WIDTH) s3(bx, by, cx, cy, ax, ay, px, py, o3);
 	assign out = o1 & o2 & o3;
 endmodule
 
 module same_side(
-	input [15:0] ax, ay, bx, by, p1x, p1y, p2x, p2y,
-	output out
+	ax, ay, bx, by, p1x, p1y, p2x, p2y,
+	out
 );
+	parameter WIDTH=16;
+	input [WIDTH-1:0] ax, ay, bx, by, p1x, p1y, p2x, p2y;
+	output out;
 
-	wire [15:0] v1x, v1y, v2x, v2y, v3x, v3y, c1, c2;
+	wire [WIDTH-1:0] v1x, v1y, v2x, v2y, v3x, v3y, c1, c2;
 
 	assign v1x = bx - ax;
 	assign v1y = by - ay;
@@ -105,9 +120,9 @@ module same_side(
 	assign v3x = p2x - ax;
 	assign v3y = p2y - ay;
 	
-	cross2D cross1(v1x, v1y, v2x, v2y, c1);
-	cross2D cross2(v1x, v1y, v3x, v3y, c2);
+	cross2D #(WIDTH) cross1(v1x, v1y, v2x, v2y, c1);
+	cross2D #(WIDTH) cross2(v1x, v1y, v3x, v3y, c2);
 	
-	assign out = c1[15] == c2[15];
+	assign out = c1[WIDTH-1] == c2[WIDTH-1];
 
 endmodule
