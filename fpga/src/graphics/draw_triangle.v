@@ -1,5 +1,5 @@
 module draw_triangle(
-	clock, resetn,
+	clock, reset,
 	ax, ay, bx, by, cx, cy,
 	colour,
 	draw_en,
@@ -17,7 +17,7 @@ module draw_triangle(
 	parameter WIDTH=8;
 	parameter COLOUR_WIDTH=3;
 
-	input wire clock, resetn;
+	input wire clock, reset;
 	input wire [WIDTH-1:0] ax, ay, bx, by, cx, cy;
 	input wire [COLOUR_WIDTH-1:0] colour;
 	input wire draw_en;
@@ -65,7 +65,7 @@ module draw_triangle(
 	end
 	
 	always @(posedge clock) begin
-		if(!resetn) current_state <= S_WAIT;
+		if(reset) current_state <= S_WAIT;
 		else current_state <= next_state;
 	end
 	

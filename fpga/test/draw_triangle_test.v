@@ -12,6 +12,7 @@ module draw_triangle_test(
 	output [7:0] VGA_G,		//	VGA Green[9:0]
 	output [7:0] VGA_B  	//	VGA Blue[9:0]
 );
+
 	wire screen_start;
 	wire [2:0] new_screen_colour;
 	wire [7:0] screen_x_min, screen_y_min;
@@ -22,7 +23,7 @@ module draw_triangle_test(
 
 	draw_triangle #(8,3) draw_tri(
 		.clock(CLOCK_50),
-		.resetn(KEY[0]),
+		.reset(~KEY[0]),
 		.ax(8'd125), .ay(8'd34),
 		.bx(8'd80), .by(8'd60),
 		.cx(8'd0), .cy(8'd0),
@@ -40,7 +41,7 @@ module draw_triangle_test(
 
 	screen_writer #(8,3) sw(
 		.clock(CLOCK_50),
-		.resetn(KEY[0]),
+		.reset(~KEY[0]),
 		.screen_start(screen_start),
 		.new_screen_colour(new_screen_colour),
 		.screen_x_min(screen_x_min), .screen_y_min(screen_y_min),
@@ -62,7 +63,7 @@ endmodule
 
 module screen_writer(
 	clock,
-	resetn,
+	reset,
 	screen_start,						// from logic
 	new_screen_colour,					// from logic
 	screen_x_min, screen_y_min,			// from logic
@@ -84,7 +85,7 @@ module screen_writer(
 	parameter COLOUR_WIDTH=3;
 
 	input wire clock;
-	input wire resetn;
+	input wire reset;
 	input wire screen_start;								// from logic
 	input wire [COLOUR_WIDTH-1:0] new_screen_colour;		// from logic
 	input wire [WIDTH-1:0] screen_x_min, screen_y_min;		// from logic
@@ -114,7 +115,7 @@ module screen_writer(
 
 	grid_counter #(WIDTH) gc(
 		.clock			(clock),
-		.resetn			(resetn & (current_state == S_DRAW)),
+		.resetn			(!(reset || current_state != S_DRAW)),
 		.enable			(current_state == S_DRAW),
 		.x_max			(screen_x_range),
 		.y_max			(screen_y_range),
@@ -124,7 +125,7 @@ module screen_writer(
 	);
 
 	vga_adapter vga(
-		.resetn(resetn),
+		.resetn(~reset),
 		.clock(clock),
 		.colour(new_screen_colour),
 		.x(screen_x), .y(screen_y),
@@ -152,7 +153,7 @@ module screen_writer(
 	end
 	
 	always @(posedge clock) begin
-		if(!resetn) current_state <= S_WAIT;
+		if(reset) current_state <= S_WAIT;
 		else current_state <= next_state;
 	end
 
