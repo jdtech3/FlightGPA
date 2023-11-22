@@ -115,7 +115,7 @@ module screen_writer(
 
 	grid_counter #(WIDTH) gc(
 		.clock			(clock),
-		.resetn			(!(reset || current_state != S_DRAW)),
+		.reset			(reset || current_state != S_DRAW),
 		.enable			(current_state == S_DRAW),
 		.x_max			(screen_x_range),
 		.y_max			(screen_y_range),

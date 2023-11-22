@@ -11,7 +11,7 @@ module draw_triangle(
 	screen_x_range, screen_y_range,		// to interface
 	screen_x, screen_y,					// from interface
 	old_screen_colour,					// from interface
-	screen_done,						// from interface
+	screen_done							// from interface
 );
 
 	parameter WIDTH=8;
