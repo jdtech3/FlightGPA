@@ -21,12 +21,12 @@ module draw_triangle_test(
 	wire [2:0] old_screen_colour;
 	wire screen_done;
 
-	draw_triangle #(8,3) draw_tri(
+	draw_triangle #(16,3) draw_tri(
 		.clock(CLOCK_50),
 		.reset(~KEY[0]),
-		.ax(8'd125), .ay(8'd34),
-		.bx(8'd80), .by(8'd60),
-		.cx(8'd0), .cy(8'd0),
+		.ax(16'd0), .ay(16'd0),
+		.bx(16'd160), .by(16'd100),
+		.cx(16'd60), .cy(16'd100),
 		.colour(3'b111),
 		.draw_en(~KEY[1]),
 
@@ -39,7 +39,7 @@ module draw_triangle_test(
 		.screen_done(screen_done)
 	);
 
-	screen_writer #(8,3) sw(
+	screen_writer #(16,3) sw(
 		.clock(CLOCK_50),
 		.reset(~KEY[0]),
 		.screen_start(screen_start),
