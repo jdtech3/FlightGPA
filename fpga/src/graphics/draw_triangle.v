@@ -49,7 +49,7 @@ module draw_triangle(
 	assign screen_start = draw_en;
 	assign draw_done = screen_done;
 	
-	inside_triangle #(16) in_tri(
+	inside_triangle #(WIDTH) in_tri(
 		ax, ay,
 		bx, by,
 		cx, cy,
