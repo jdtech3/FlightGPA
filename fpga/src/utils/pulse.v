@@ -4,7 +4,7 @@ module pulse(clock,reset,out);
     input wire clock, reset;
     output wire out;
 
-    localparam COUNT_MAX = CLOCK_FREQUENCY*(DURATION/1000);
+    localparam COUNT_MAX = CLOCK_FREQUENCY/(1000/DURATION);
     localparam WIDTH=$clog2(COUNT_MAX);
     
     wire [WIDTH-1:0] counter_val;
