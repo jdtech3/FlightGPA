@@ -1,7 +1,7 @@
 vlib work
 
 vlog ../src/utils/math.v ../ip/float/float_add.v ../ip/float/float_mult.v ../src/utils/counter.v
-vsim -L lpm_ver mat_vec_mult -t 1ns
+vsim -L lpm_ver mat_vec_mult3D -t 1ns
 
 log {/*}
 add wave {/*}
