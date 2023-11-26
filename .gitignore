@@ -20,3 +20,6 @@
 **/work/
 **/simulation/
 vsim.wlf
+
+# Temp files
+*~
