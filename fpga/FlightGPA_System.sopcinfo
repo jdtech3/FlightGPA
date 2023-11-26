@@ -5,11 +5,11 @@
  version="1.0"
  fabric="QSYS">
  <!-- Format version 18.1 625 (Future versions may contain additional information.) -->
- <!-- 2023.11.09.16:05:56 -->
+ <!-- 2023.11.25.22:01:03 -->
  <!-- A collection of modules and connections -->
  <parameter name="AUTO_GENERATION_ID">
   <type>java.lang.Integer</type>
-  <value>1699563956</value>
+  <value>1700967663</value>
   <derived>false</derived>
   <enabled>true</enabled>
   <visible>false</visible>
@@ -1569,55 +1569,15 @@ parameters are a RESULT of the module parameters. -->
  <module
    name="sdram_interface"
    kind="sdram_interface"
-   version="1.0"
+   version="1.1"
    path="sdram_interface">
   <!-- Describes a single module. Module parameters are
 the requested settings for a module instance. -->
-  <parameter name="S_IDLE">
-   <type>java.math.BigInteger</type>
-   <value>0</value>
+  <parameter name="DATA_WIDTH">
+   <type>java.lang.String</type>
+   <value>32</value>
    <derived>false</derived>
-   <enabled>false</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="S_START">
-   <type>java.math.BigInteger</type>
-   <value>1</value>
-   <derived>false</derived>
-   <enabled>false</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="S_PRETRANSFER">
-   <type>java.math.BigInteger</type>
-   <value>2</value>
-   <derived>false</derived>
-   <enabled>false</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="S_WRITE">
-   <type>java.math.BigInteger</type>
-   <value>3</value>
-   <derived>false</derived>
-   <enabled>false</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="S_POST_WRITE">
-   <type>java.math.BigInteger</type>
-   <value>4</value>
-   <derived>false</derived>
-   <enabled>false</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="S_DONE">
-   <type>java.math.BigInteger</type>
-   <value>5</value>
-   <derived>false</derived>
-   <enabled>false</enabled>
+   <enabled>true</enabled>
    <visible>true</visible>
    <valid>true</valid>
   </parameter>
@@ -1727,7 +1687,7 @@ parameters are a RESULT of the module parameters. -->
     <role>reset</role>
    </port>
   </interface>
-  <interface name="avm_m0" kind="avalon_master" version="18.1">
+  <interface name="rm" kind="avalon_master" version="18.1">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
@@ -1990,52 +1950,34 @@ parameters are a RESULT of the module parameters. -->
    <type>avalon</type>
    <isStart>true</isStart>
    <port>
-    <name>avm_m0_address</name>
+    <name>rm_address</name>
     <direction>Output</direction>
     <width>32</width>
     <role>address</role>
    </port>
    <port>
-    <name>avm_m0_read</name>
-    <direction>Output</direction>
-    <width>1</width>
-    <role>read</role>
-   </port>
-   <port>
-    <name>avm_m0_waitrequest</name>
-    <direction>Input</direction>
-    <width>1</width>
-    <role>waitrequest</role>
-   </port>
-   <port>
-    <name>avm_m0_readdata</name>
+    <name>rm_readdata</name>
     <direction>Input</direction>
     <width>32</width>
     <role>readdata</role>
    </port>
    <port>
-    <name>avm_m0_write</name>
+    <name>rm_read</name>
     <direction>Output</direction>
     <width>1</width>
-    <role>write</role>
+    <role>read</role>
    </port>
    <port>
-    <name>avm_m0_writedata</name>
-    <direction>Output</direction>
-    <width>32</width>
-    <role>writedata</role>
-   </port>
-   <port>
-    <name>avm_m0_byteenable</name>
-    <direction>Output</direction>
-    <width>4</width>
-    <role>byteenable</role>
-   </port>
-   <port>
-    <name>avm_m0_readdatavalid</name>
+    <name>rm_readdatavalid</name>
     <direction>Input</direction>
     <width>1</width>
     <role>readdatavalid</role>
+   </port>
+   <port>
+    <name>rm_waitrequest</name>
+    <direction>Input</direction>
+    <width>1</width>
+    <role>waitrequest</role>
    </port>
    <memoryBlock>
     <isBridge>false</isBridge>
@@ -2046,10 +1988,42 @@ parameters are a RESULT of the module parameters. -->
     <span>67108864</span>
    </memoryBlock>
   </interface>
-  <interface name="color" kind="conduit_end" version="18.1">
+  <interface name="wm" kind="avalon_master" version="18.1">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
+   <parameter name="adaptsTo">
+    <type>com.altera.entityinterfaces.IConnectionPoint</type>
+    <value></value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="addressGroup">
+    <type>int</type>
+    <value>0</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="addressUnits">
+    <type>com.altera.sopcmodel.avalon.EAddrBurstUnits</type>
+    <value>SYMBOLS</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="alwaysBurstMaxBurst">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
    <parameter name="associatedClock">
     <type>java.lang.String</type>
     <value>clock</value>
@@ -2061,6 +2035,198 @@ parameters are a RESULT of the module parameters. -->
    <parameter name="associatedReset">
     <type>java.lang.String</type>
     <value>reset</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="bitsPerSymbol">
+    <type>int</type>
+    <value>8</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="burstOnBurstBoundariesOnly">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="burstcountUnits">
+    <type>com.altera.sopcmodel.avalon.EAddrBurstUnits</type>
+    <value>WORDS</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="constantBurstBehavior">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="dBSBigEndian">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="doStreamReads">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="doStreamWrites">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="holdTime">
+    <type>int</type>
+    <value>0</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="interleaveBursts">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="isAsynchronous">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="isBigEndian">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="isReadable">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="isWriteable">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="linewrapBursts">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="maxAddressWidth">
+    <type>int</type>
+    <value>32</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="maximumPendingReadTransactions">
+    <type>int</type>
+    <value>0</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="maximumPendingWriteTransactions">
+    <type>int</type>
+    <value>0</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="readLatency">
+    <type>int</type>
+    <value>0</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="readWaitTime">
+    <type>int</type>
+    <value>1</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="registerIncomingSignals">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="registerOutgoingSignals">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="setupTime">
+    <type>int</type>
+    <value>0</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="timingUnits">
+    <type>com.altera.sopcmodel.avalon.TimingUnits</type>
+    <value>Cycles</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="writeWaitTime">
+    <type>int</type>
+    <value>0</value>
     <derived>false</derived>
     <enabled>true</enabled>
     <visible>true</visible>
@@ -2082,14 +2248,40 @@ parameters are a RESULT of the module parameters. -->
     <visible>true</visible>
     <valid>true</valid>
    </parameter>
-   <type>conduit</type>
-   <isStart>false</isStart>
+   <type>avalon</type>
+   <isStart>true</isStart>
    <port>
-    <name>color</name>
-    <direction>Input</direction>
+    <name>wm_address</name>
+    <direction>Output</direction>
     <width>32</width>
-    <role>color</role>
+    <role>address</role>
    </port>
+   <port>
+    <name>wm_writedata</name>
+    <direction>Output</direction>
+    <width>32</width>
+    <role>writedata</role>
+   </port>
+   <port>
+    <name>wm_write</name>
+    <direction>Output</direction>
+    <width>1</width>
+    <role>write</role>
+   </port>
+   <port>
+    <name>wm_waitrequest</name>
+    <direction>Input</direction>
+    <width>1</width>
+    <role>waitrequest</role>
+   </port>
+   <memoryBlock>
+    <isBridge>false</isBridge>
+    <moduleName>sdram_controller</moduleName>
+    <slaveName>s1</slaveName>
+    <name>sdram_controller.s1</name>
+    <baseAddress>0</baseAddress>
+    <span>67108864</span>
+   </memoryBlock>
   </interface>
  </module>
  <module
@@ -5385,14 +5577,14 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>s1</endConnectionPoint>
  </connection>
  <connection
-   name="sdram_interface.avm_m0/sdram_controller.s1"
+   name="sdram_interface.rm/sdram_controller.s1"
    kind="avalon"
    version="18.1"
-   start="sdram_interface.avm_m0"
+   start="sdram_interface.rm"
    end="sdram_controller.s1">
   <parameter name="arbitrationPriority">
    <type>int</type>
-   <value>64</value>
+   <value>32</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -5431,7 +5623,58 @@ parameters are a RESULT of the module parameters. -->
    <valid>true</valid>
   </parameter>
   <startModule>sdram_interface</startModule>
-  <startConnectionPoint>avm_m0</startConnectionPoint>
+  <startConnectionPoint>rm</startConnectionPoint>
+  <endModule>sdram_controller</endModule>
+  <endConnectionPoint>s1</endConnectionPoint>
+ </connection>
+ <connection
+   name="sdram_interface.wm/sdram_controller.s1"
+   kind="avalon"
+   version="18.1"
+   start="sdram_interface.wm"
+   end="sdram_controller.s1">
+  <parameter name="arbitrationPriority">
+   <type>int</type>
+   <value>32</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="baseAddress">
+   <type>java.math.BigInteger</type>
+   <value>0x0000</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="defaultConnection">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>sdram_interface</startModule>
+  <startConnectionPoint>wm</startConnectionPoint>
   <endModule>sdram_controller</endModule>
   <endConnectionPoint>s1</endConnectionPoint>
  </connection>
@@ -5951,7 +6194,7 @@ parameters are a RESULT of the module parameters. -->
   <version>18.1</version>
  </plugin>
  <plugin>
-  <instanceCount>3</instanceCount>
+  <instanceCount>2</instanceCount>
   <name>conduit_end</name>
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IMutableConnectionPoint</subtype>
@@ -5964,10 +6207,10 @@ parameters are a RESULT of the module parameters. -->
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IModule</subtype>
   <displayName>SDRAM Avalon MM Master</displayName>
-  <version>1.0</version>
+  <version>1.1</version>
  </plugin>
  <plugin>
-  <instanceCount>2</instanceCount>
+  <instanceCount>3</instanceCount>
   <name>avalon_master</name>
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IMutableConnectionPoint</subtype>
@@ -6031,7 +6274,7 @@ parameters are a RESULT of the module parameters. -->
   <version>18.0</version>
  </plugin>
  <plugin>
-  <instanceCount>2</instanceCount>
+  <instanceCount>3</instanceCount>
   <name>avalon</name>
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IConnection</subtype>

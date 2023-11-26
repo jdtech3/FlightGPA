@@ -27,7 +27,9 @@ module FlightGPA (
     output          VGA_VS,
     
     // I/O
-    input   [3:0]   KEY
+    input   [3:0]   KEY,
+    input   [9:0]   SW,
+    output  [9:0]   LEDR
 );
     
     // --- Instantiating the system ---
@@ -61,12 +63,9 @@ module FlightGPA (
         .vga_R                  (VGA_R),
         .vga_G                  (VGA_G),
         .vga_B                  (VGA_B),
-		
-		// Misc
-		.sdram_interface_color_color(SW)
 
 	);
 	
-	assign LEDR[9:0] = {2'b00, SW[7:0]};
+    assign LEDR[9:0] = {2'b00, SW[7:0]};
     
 endmodule

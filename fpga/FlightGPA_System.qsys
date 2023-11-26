@@ -97,6 +97,14 @@
          type = "String";
       }
    }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
    element main_pll
    {
       datum _sortIndex
@@ -192,11 +200,7 @@
    internal="main_pll.sdram_clk"
    type="clock"
    dir="start" />
- <interface
-   name="sdram_interface_color"
-   internal="sdram_interface.color"
-   type="conduit"
-   dir="end" />
+ <interface name="sdram_interface_color" internal="sdram_interface.color" />
  <interface name="sys_ref_clk" internal="main_pll.ref_clk" type="clock" dir="end" />
  <interface
    name="sys_ref_reset"
@@ -262,14 +266,9 @@
  <module
    name="sdram_interface"
    kind="sdram_interface"
-   version="1.0"
+   version="1.1"
    enabled="1">
-  <parameter name="S_DONE" value="5" />
-  <parameter name="S_IDLE" value="0" />
-  <parameter name="S_POST_WRITE" value="4" />
-  <parameter name="S_PRETRANSFER" value="2" />
-  <parameter name="S_START" value="1" />
-  <parameter name="S_WRITE" value="3" />
+  <parameter name="DATA_WIDTH" value="32" />
  </module>
  <module
    name="vga_controller"
@@ -347,9 +346,18 @@
  <connection
    kind="avalon"
    version="18.1"
-   start="sdram_interface.avm_m0"
+   start="sdram_interface.rm"
    end="sdram_controller.s1">
-  <parameter name="arbitrationPriority" value="64" />
+  <parameter name="arbitrationPriority" value="32" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="sdram_interface.wm"
+   end="sdram_controller.s1">
+  <parameter name="arbitrationPriority" value="32" />
   <parameter name="baseAddress" value="0x0000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
