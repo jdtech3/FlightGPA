@@ -1,7 +1,7 @@
 vlib work
 
 vlog ../src/utils/math.v ../ip/float/float_add.v
-vsim -L lpm_ver pipe_add3 -t 1ns
+vsim -L lpm_ver pipe_add4 -t 1ns
 
 log {/*}
 add wave {/*}
