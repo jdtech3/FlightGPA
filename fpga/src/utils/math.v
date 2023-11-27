@@ -233,9 +233,6 @@ module mat_vec_mult4D(
 				feed_v <= v41;
 				feed_m <= m44;
 			end
-
-
-			
 			16: begin
 				feed_v <= v12;
 				feed_m <= m11;
@@ -302,10 +299,6 @@ module mat_vec_mult4D(
 				feed_v <= v42;
 				feed_m <= m44;
 			end
-
-
-
-
 			32: begin
 				o31 <= pipe_res;
 				feed_v <= v13;
@@ -374,10 +367,6 @@ module mat_vec_mult4D(
 				feed_v <= v43;
 				feed_m <= m44;
 			end
-
-
-
-
 			48: begin
 				o32 <= pipe_res;
 				feed_v <= v14;
@@ -446,10 +435,8 @@ module mat_vec_mult4D(
 				feed_v <= v44;
 				feed_m <= m44;
 			end
-
 			64: o33 <= pipe_res;
 			68: o43 <= pipe_res;
-
 			72: o14 <= pipe_res;
 			76: o24 <= pipe_res;
 			80: o34 <= pipe_res;
