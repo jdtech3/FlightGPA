@@ -1,6 +1,6 @@
 vlib work
 
-vlog ../src/utils/math.v ../ip/float/float_add.v
+vlog ../src/utils/math/pipe_add3.v ../ip/float/float_add.v
 vsim -L lpm_ver pipe_add3 -t 1ns
 
 log {/*}
