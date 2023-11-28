@@ -9,6 +9,102 @@
    categories="System" />
  <parameter name="bonusData"><![CDATA[bonusData 
 {
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
    element main_pll
    {
       datum _sortIndex
@@ -21,6 +117,14 @@
    {
       datum _sortIndex
       {
+         value = "3";
+         type = "int";
+      }
+   }
+   element sdram_interface
+   {
+      datum _sortIndex
+      {
          value = "2";
          type = "int";
       }
@@ -29,7 +133,7 @@
    {
       datum _sortIndex
       {
-         value = "6";
+         value = "7";
          type = "int";
       }
    }
@@ -37,7 +141,7 @@
    {
       datum _sortIndex
       {
-         value = "5";
+         value = "6";
          type = "int";
       }
    }
@@ -45,7 +149,7 @@
    {
       datum _sortIndex
       {
-         value = "3";
+         value = "4";
          type = "int";
       }
    }
@@ -61,7 +165,7 @@
    {
       datum _sortIndex
       {
-         value = "4";
+         value = "5";
          type = "int";
       }
    }
@@ -96,6 +200,7 @@
    internal="main_pll.sdram_clk"
    type="clock"
    dir="start" />
+ <interface name="sdram_interface_color" internal="sdram_interface.color" />
  <interface name="sys_ref_clk" internal="main_pll.ref_clk" type="clock" dir="end" />
  <interface
    name="sys_ref_reset"
@@ -125,7 +230,7 @@
   <parameter name="CV_boards" value="DE1-SoC" />
   <parameter name="MAX10_boards" value="DE10-Lite" />
   <parameter name="device_family" value="Cyclone V" />
-  <parameter name="gui_outclk" value="50.0" />
+  <parameter name="gui_outclk" value="170.0" />
   <parameter name="gui_refclk" value="50.0" />
   <parameter name="other_boards" value="None" />
  </module>
@@ -141,7 +246,7 @@
   <parameter name="TRP" value="20.0" />
   <parameter name="TWR" value="14.0" />
   <parameter name="casLatency" value="3" />
-  <parameter name="clockRate" value="50000000" />
+  <parameter name="clockRate" value="170000000" />
   <parameter name="columnWidth" value="10" />
   <parameter name="componentName">$${FILENAME}_sdram_controller</parameter>
   <parameter name="dataWidth" value="16" />
@@ -157,6 +262,13 @@
   <parameter name="refreshPeriod" value="15.625" />
   <parameter name="registerDataIn" value="true" />
   <parameter name="rowWidth" value="13" />
+ </module>
+ <module
+   name="sdram_interface"
+   kind="sdram_interface"
+   version="1.1"
+   enabled="1">
+  <parameter name="DATA_WIDTH" value="32" />
  </module>
  <module
    name="vga_controller"
@@ -175,7 +287,7 @@
    kind="altera_up_avalon_video_dual_clock_buffer"
    version="18.0"
    enabled="1">
-  <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE" value="50000000" />
+  <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE" value="170000000" />
   <parameter name="AUTO_CLOCK_STREAM_OUT_CLOCK_RATE" value="25000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
   <parameter name="color_bits" value="10" />
@@ -186,11 +298,11 @@
    kind="altera_up_avalon_video_pixel_buffer_dma"
    version="18.0"
    enabled="1">
-  <parameter name="AUTO_CLK_CLOCK_RATE" value="50000000" />
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="170000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
   <parameter name="addr_mode" value="Consecutive" />
   <parameter name="back_start_address" value="0" />
-  <parameter name="color_space" value="8-bit RGB" />
+  <parameter name="color_space" value="32-bit RGBA" />
   <parameter name="image_height" value="480" />
   <parameter name="image_width" value="640" />
   <parameter name="start_address" value="0" />
@@ -216,10 +328,10 @@
    kind="altera_up_avalon_video_rgb_resampler"
    version="18.0"
    enabled="1">
-  <parameter name="AUTO_CLK_CLOCK_RATE" value="50000000" />
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="170000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
   <parameter name="alpha" value="1023" />
-  <parameter name="input_type" value="8-bit RGB" />
+  <parameter name="input_type" value="32-bit RGBA" />
   <parameter name="output_type" value="30-bit RGB" />
  </module>
  <connection
@@ -228,6 +340,24 @@
    start="vga_pixel_buffer_dma.avalon_pixel_dma_master"
    end="sdram_controller.s1">
   <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="sdram_interface.rm"
+   end="sdram_controller.s1">
+  <parameter name="arbitrationPriority" value="32" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="sdram_interface.wm"
+   end="sdram_controller.s1">
+  <parameter name="arbitrationPriority" value="32" />
   <parameter name="baseAddress" value="0x0000" />
   <parameter name="defaultConnection" value="false" />
  </connection>
@@ -261,6 +391,11 @@
    version="18.1"
    start="main_pll.sys_clk"
    end="vga_pixel_buffer_dma.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="main_pll.sys_clk"
+   end="sdram_interface.clock" />
  <connection
    kind="clock"
    version="18.1"
@@ -300,6 +435,11 @@
    kind="reset"
    version="18.1"
    start="main_pll.reset_source"
+   end="sdram_interface.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="main_pll.reset_source"
    end="vga_fifo.reset_stream_in" />
  <connection
    kind="reset"
@@ -308,6 +448,11 @@
    end="vga_fifo.reset_stream_out" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />
+ <interconnectRequirement for="$system" name="qsys_mm.enableInstrumentation" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.insertDefaultSlave" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.maxAdditionalLatency" value="1" />
+ <interconnectRequirement
+   for="sdram_controller.s1"
+   name="qsys_mm.insertPerformanceMonitor"
+   value="FALSE" />
 </system>
