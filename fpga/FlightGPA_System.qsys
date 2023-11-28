@@ -230,7 +230,7 @@
   <parameter name="CV_boards" value="DE1-SoC" />
   <parameter name="MAX10_boards" value="DE10-Lite" />
   <parameter name="device_family" value="Cyclone V" />
-  <parameter name="gui_outclk" value="150.0" />
+  <parameter name="gui_outclk" value="170.0" />
   <parameter name="gui_refclk" value="50.0" />
   <parameter name="other_boards" value="None" />
  </module>
@@ -246,7 +246,7 @@
   <parameter name="TRP" value="20.0" />
   <parameter name="TWR" value="14.0" />
   <parameter name="casLatency" value="3" />
-  <parameter name="clockRate" value="150000000" />
+  <parameter name="clockRate" value="170000000" />
   <parameter name="columnWidth" value="10" />
   <parameter name="componentName">$${FILENAME}_sdram_controller</parameter>
   <parameter name="dataWidth" value="16" />
@@ -287,7 +287,7 @@
    kind="altera_up_avalon_video_dual_clock_buffer"
    version="18.0"
    enabled="1">
-  <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE" value="150000000" />
+  <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE" value="170000000" />
   <parameter name="AUTO_CLOCK_STREAM_OUT_CLOCK_RATE" value="25000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
   <parameter name="color_bits" value="10" />
@@ -298,7 +298,7 @@
    kind="altera_up_avalon_video_pixel_buffer_dma"
    version="18.0"
    enabled="1">
-  <parameter name="AUTO_CLK_CLOCK_RATE" value="150000000" />
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="170000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
   <parameter name="addr_mode" value="Consecutive" />
   <parameter name="back_start_address" value="0" />
@@ -328,7 +328,7 @@
    kind="altera_up_avalon_video_rgb_resampler"
    version="18.0"
    enabled="1">
-  <parameter name="AUTO_CLK_CLOCK_RATE" value="150000000" />
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="170000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
   <parameter name="alpha" value="1023" />
   <parameter name="input_type" value="32-bit RGBA" />
@@ -448,11 +448,11 @@
    end="vga_fifo.reset_stream_out" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />
- <interconnectRequirement for="$system" name="qsys_mm.enableInstrumentation" value="TRUE" />
+ <interconnectRequirement for="$system" name="qsys_mm.enableInstrumentation" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.insertDefaultSlave" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.maxAdditionalLatency" value="1" />
  <interconnectRequirement
    for="sdram_controller.s1"
    name="qsys_mm.insertPerformanceMonitor"
-   value="TRUE" />
+   value="FALSE" />
 </system>
