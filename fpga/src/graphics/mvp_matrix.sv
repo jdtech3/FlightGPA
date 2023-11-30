@@ -1,5 +1,5 @@
-module orientation_matrix(
-    input clock, reset, start,
+module mvp_matrix(
+    input clock, reset, start, update_mvp,
     input [31:0] roll, pitch, yaw,
     input [31:0] x, y, z,
     output wire [31:0] o [3:0][3:0],
@@ -23,18 +23,22 @@ module orientation_matrix(
     wire [5:0] count;
     wire mat_mult_done;
     wire count_done;
-    reg [2:0] current_state, next_state;
+    reg [7:0] current_state, next_state;
 
     localparam
-		S_WAIT              = 3'd0,
-        S_CALC_TRIG         = 3'd1,
-        S_MULT_ROTYX_START  = 3'd2,
-		S_MULT_ROTYX        = 3'd3,
-		S_MULT_ROTZYX_START = 3'd4,
-        S_MULT_ROTZYX       = 3'd5;
+		S_WAIT              = 8'd0,
+        S_CALC_TRIG         = 8'd1,
+        S_MULT_ROTYX_START  = 8'd2,
+		S_MULT_ROTYX        = 8'd3,
+		S_MULT_ROTZYX_START = 8'd4,
+        S_MULT_ROTZYX       = 8'd5,
+        S_MULT_PROJ_START   = 8'd6,
+        S_MULT_PROJ         = 8'd7,
+        S_TRANSFORM_START   = 8'd8,
+        S_TRANSFORM         = 8'd9;
 
     assign count_done = count == 39;
-    assign done = current_state == S_WAIT;
+    assign done = (current_state == S_WAIT) || ((current_state == S_TRANSFORM || current_state == S_MULT_PROJ) && mat_mult_done);
 
     assign neg_sin_roll = {~sin_roll[31], sin_roll[30:0]};
     assign neg_sin_pitch = {~sin_pitch[31], sin_pitch[30:0]};
@@ -59,7 +63,11 @@ module orientation_matrix(
     mat_mult4D matrix_mult_inst(
         .clock(clock),
         .reset(reset),
-        .start(current_state == S_MULT_ROTYX_START || current_state == S_MULT_ROTZYX_START),
+        .start(
+            current_state == S_MULT_ROTYX_START ||
+            current_state == S_MULT_ROTZYX_START ||
+            current_state == S_MULT_PROJ_START ||
+            current_state == S_TRANSFORM_START),
         .mult_vec(1'b0),
         .m(m),
         .v(v),
@@ -76,12 +84,16 @@ module orientation_matrix(
     
     always @(*) begin
 		case(current_state)
-			S_WAIT: next_state <= start ? S_CALC_TRIG : S_WAIT;
-			S_CALC_TRIG: next_state <= count_done ? S_MULT_ROTYX_START : S_CALC_TRIG;
-            S_MULT_ROTYX_START: next_state <= S_MULT_ROTYX;
-			S_MULT_ROTYX: next_state <= mat_mult_done ? S_MULT_ROTZYX_START : S_MULT_ROTYX;
+			S_WAIT:              next_state <= start ? (update_mvp ? S_CALC_TRIG : S_TRANSFORM_START) : S_WAIT;
+			S_CALC_TRIG:         next_state <= count_done ? S_MULT_ROTYX_START : S_CALC_TRIG;
+            S_MULT_ROTYX_START:  next_state <= S_MULT_ROTYX;
+			S_MULT_ROTYX:        next_state <= mat_mult_done ? S_MULT_ROTZYX_START : S_MULT_ROTYX;
             S_MULT_ROTZYX_START: next_state <= S_MULT_ROTZYX;
-            S_MULT_ROTZYX: next_state <= mat_mult_done ? S_WAIT: S_MULT_ROTZYX;
+            S_MULT_ROTZYX:       next_state <= mat_mult_done ? S_MULT_PROJ_START: S_MULT_ROTZYX;
+            S_MULT_PROJ_START:   next_state <= S_MULT_PROJ;
+            S_MULT_PROJ:         next_state <= mat_mult_done ? S_WAIT : S_MULT_PROJ;
+            S_TRANSFORM_START:   next_state <= S_TRANSFORM;
+            S_TRANSFORM:         next_state <= mat_mult_done ? S_WAIT: S_TRANSFORM;
 		endcase
 	end
 
@@ -123,6 +135,21 @@ module orientation_matrix(
                 m[3][0] <= 0;       m[3][1] <= 0;           m[3][2] <= 0;            m[3][3] <= 32'h3f800000;
 
                 v <= o;
+            end
+            S_MULT_PROJ_START: begin
+                m[0][0] <= 32'h3f891a2a; m[0][1] <= 0;            m[0][2] <= 0;            m[0][3] <= 0;
+                m[1][0] <= 0;            m[1][1] <= 32'h3fb6cd8e; m[1][2] <= 0;            m[1][3] <= 0;
+                m[2][0] <= 0;            m[2][1] <= 0;            m[2][2] <= 32'hbf80419a; m[2][3] <= 32'hc00020cd;
+                m[3][0] <= 0;            m[3][1] <= 0;            m[3][2] <= 32'hbf800000; m[3][3] <= 0;
+
+                v <= o;
+            end
+            S_MULT_PROJ: if(mat_mult_done) m <= o;
+            S_TRANSFORM_START: begin
+                v[0][0] <= x;
+                v[1][0] <= y;
+                v[2][0] <= z;
+                v[3][0] <= 32'h3f800000;
             end
         endcase
     end
