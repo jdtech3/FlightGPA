@@ -26,12 +26,12 @@ module orientation_matrix(
     reg [2:0] current_state, next_state;
 
     localparam
-		S_WAIT          = 3'd0,
-        S_CALC_TRIG     = 3'd1,
-        S_MULT_1_START  = 3'd2,
-		S_MULT_1        = 3'd3,
-		S_MULT_2_START  = 3'd4,
-        S_MULT_2        = 3'd5;
+		S_WAIT              = 3'd0,
+        S_CALC_TRIG         = 3'd1,
+        S_MULT_ROTYX_START  = 3'd2,
+		S_MULT_ROTYX        = 3'd3,
+		S_MULT_ROTZYX_START = 3'd4,
+        S_MULT_ROTZYX       = 3'd5;
 
     assign count_done = count == 39;
     assign done = current_state == S_WAIT;
@@ -59,7 +59,7 @@ module orientation_matrix(
     mat_mult4D matrix_mult_inst(
         .clock(clock),
         .reset(reset),
-        .start(current_state == S_MULT_1_START || current_state == S_MULT_2_START),
+        .start(current_state == S_MULT_ROTYX_START || current_state == S_MULT_ROTZYX_START),
         .mult_vec(1'b0),
         .m(m),
         .v(v),
@@ -77,11 +77,11 @@ module orientation_matrix(
     always @(*) begin
 		case(current_state)
 			S_WAIT: next_state <= start ? S_CALC_TRIG : S_WAIT;
-			S_CALC_TRIG: next_state <= count_done ? S_MULT_1_START : S_CALC_TRIG;
-            S_MULT_1_START: next_state <= S_MULT_1;
-			S_MULT_1: next_state <= mat_mult_done ? S_MULT_2_START : S_MULT_1;
-            S_MULT_2_START: next_state <= S_MULT_2;
-            S_MULT_2: next_state <= mat_mult_done ? S_WAIT: S_MULT_2;
+			S_CALC_TRIG: next_state <= count_done ? S_MULT_ROTYX_START : S_CALC_TRIG;
+            S_MULT_ROTYX_START: next_state <= S_MULT_ROTYX;
+			S_MULT_ROTYX: next_state <= mat_mult_done ? S_MULT_ROTZYX_START : S_MULT_ROTYX;
+            S_MULT_ROTZYX_START: next_state <= S_MULT_ROTZYX;
+            S_MULT_ROTZYX: next_state <= mat_mult_done ? S_WAIT: S_MULT_ROTZYX;
 		endcase
 	end
 
@@ -105,7 +105,7 @@ module orientation_matrix(
             39: sin_yaw <= sin_out;
         endcase
         case(current_state)
-            S_MULT_1_START: begin
+            S_MULT_ROTYX_START: begin
                 m[0][0] <= cos_pitch;     m[0][1] <= 0;            m[0][2] <= sin_pitch; m[0][3] <= 0;
                 m[1][0] <= 0;             m[1][1] <= 32'h3f800000; m[1][2] <= 0;         m[1][3] <= 0;
                 m[2][0] <= neg_sin_pitch; m[2][1] <= 0;            m[2][2] <= cos_pitch; m[2][3] <= 0;
@@ -116,7 +116,7 @@ module orientation_matrix(
                 v[2][0] <= 0;            v[2][1] <= sin_roll; v[2][2] <= cos_roll;     v[2][3] <= 0;
                 v[3][0] <= 0;            v[3][1] <= 0;        v[3][2] <= 0;            v[3][3] <= 32'h3f800000;
             end
-            S_MULT_2_START: begin
+            S_MULT_ROTZYX_START: begin
                 m[0][0] <= cos_yaw; m[0][1] <= neg_sin_yaw; m[0][2] <= 0;            m[0][3] <= x;
                 m[1][0] <= sin_yaw; m[1][1] <= cos_yaw;     m[1][2] <= 0;            m[1][3] <= y;
                 m[2][0] <= 0;       m[2][1] <= 0;           m[2][2] <= 32'h3f800000; m[2][3] <= z;
