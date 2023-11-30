@@ -1,6 +1,6 @@
 vlib work
 
-vlog ../src/graphics/orientation_matrix.v ../src/utils/math/mat_mult4D.v ../ip/float/float_sin.v ../ip/float/float_cos.v
+vlog ../src/graphics/orientation_matrix.sv ../src/utils/math/mat_mult4D.sv ../ip/float/float_sin.v ../ip/float/float_cos.v
 vsim -L lpm_ver orientation_matrix -t 1ns
 
 log {/*}
