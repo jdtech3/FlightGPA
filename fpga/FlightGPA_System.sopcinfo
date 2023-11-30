@@ -5,11 +5,11 @@
  version="1.0"
  fabric="QSYS">
  <!-- Format version 18.1 625 (Future versions may contain additional information.) -->
- <!-- 2023.11.28.15:49:35 -->
+ <!-- 2023.11.29.23:35:53 -->
  <!-- A collection of modules and connections -->
  <parameter name="AUTO_GENERATION_ID">
   <type>java.lang.Integer</type>
-  <value>1701204575</value>
+  <value>1701318953</value>
   <derived>false</derived>
   <enabled>true</enabled>
   <visible>false</visible>
@@ -154,7 +154,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="gui_outclk">
    <type>double</type>
-   <value>170.0</value>
+   <value>143.0</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -162,7 +162,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="outclk">
    <type>double</type>
-   <value>170.0</value>
+   <value>143.0</value>
    <derived>true</derived>
    <enabled>false</enabled>
    <visible>false</visible>
@@ -363,7 +363,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="clockRate">
     <type>long</type>
-    <value>170000000</value>
+    <value>143000000</value>
     <derived>false</derived>
     <enabled>true</enabled>
     <visible>true</visible>
@@ -447,6 +447,12 @@ parameters are a RESULT of the module parameters. -->
     <slaveName>clock_stream_in</slaveName>
     <name>vga_fifo.clock_stream_in</name>
    </clockDomainMember>
+   <clockDomainMember>
+    <isBridge>false</isBridge>
+    <moduleName>sys_clk_bridge</moduleName>
+    <slaveName>in_clk</slaveName>
+    <name>sys_clk_bridge.in_clk</name>
+   </clockDomainMember>
   </interface>
   <interface name="sdram_clk" kind="clock_source" version="18.1">
    <!-- The connection points exposed by a module instance for the
@@ -462,7 +468,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="clockRate">
     <type>long</type>
-    <value>170000000</value>
+    <value>143000000</value>
     <derived>false</derived>
     <enabled>true</enabled>
     <visible>true</visible>
@@ -612,7 +618,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.REFRESH_PERIOD</name>
-   <value>15.625</value>
+   <value>7.8125</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.REGISTER_DATA_IN</name>
@@ -664,7 +670,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.T_AC</name>
-   <value>5.5</value>
+   <value>5.4</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.T_MRD</name>
@@ -672,7 +678,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.T_RCD</name>
-   <value>20.0</value>
+   <value>15.0</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.T_RFC</name>
@@ -680,7 +686,7 @@ the requested settings for a module instance. -->
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.T_RP</name>
-   <value>20.0</value>
+   <value>15.0</value>
   </assignment>
   <assignment>
    <name>embeddedsw.CMacro.T_WR</name>
@@ -752,7 +758,7 @@ the requested settings for a module instance. -->
   </assignment>
   <parameter name="TAC">
    <type>double</type>
-   <value>5.5</value>
+   <value>5.4</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -760,7 +766,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="TRCD">
    <type>double</type>
-   <value>20.0</value>
+   <value>15.0</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -776,7 +782,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="TRP">
    <type>double</type>
-   <value>20.0</value>
+   <value>15.0</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -872,7 +878,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="refreshPeriod">
    <type>double</type>
-   <value>15.625</value>
+   <value>7.8125</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -920,7 +926,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="clockRate">
    <type>long</type>
-   <value>170000000</value>
+   <value>143000000</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -1023,7 +1029,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="clockRate">
     <type>java.lang.Long</type>
-    <value>170000000</value>
+    <value>143000000</value>
     <derived>true</derived>
     <enabled>true</enabled>
     <visible>false</visible>
@@ -1573,11 +1579,43 @@ parameters are a RESULT of the module parameters. -->
    path="sdram_interface">
   <!-- Describes a single module. Module parameters are
 the requested settings for a module instance. -->
-  <parameter name="DATA_WIDTH">
-   <type>java.lang.String</type>
-   <value>32</value>
+  <parameter name="BASE_ADDR_OFFSET">
+   <type>int</type>
+   <value>0</value>
    <derived>false</derived>
    <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="COLOR_WIDTH">
+   <type>int</type>
+   <value>32</value>
+   <derived>false</derived>
+   <enabled>false</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="FIFO_DEPTH">
+   <type>int</type>
+   <value>32</value>
+   <derived>false</derived>
+   <enabled>false</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="ADDR_WIDTH">
+   <type>int</type>
+   <value>32</value>
+   <derived>false</derived>
+   <enabled>false</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="COORD_WIDTH">
+   <type>int</type>
+   <value>16</value>
+   <derived>false</derived>
+   <enabled>false</enabled>
    <visible>true</visible>
    <valid>true</valid>
   </parameter>
@@ -2283,6 +2321,285 @@ parameters are a RESULT of the module parameters. -->
     <span>67108864</span>
    </memoryBlock>
   </interface>
+  <interface name="ext_interface" kind="conduit_end" version="18.1">
+   <!-- The connection points exposed by a module instance for the
+particular module parameters. Connection points and their
+parameters are a RESULT of the module parameters. -->
+   <parameter name="associatedClock">
+    <type>java.lang.String</type>
+    <value>clock</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="associatedReset">
+    <type>java.lang.String</type>
+    <value></value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="deviceFamily">
+    <type>java.lang.String</type>
+    <value>UNKNOWN</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="generateLegacySim">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <type>conduit</type>
+   <isStart>false</isStart>
+   <port>
+    <name>start</name>
+    <direction>Input</direction>
+    <width>1</width>
+    <role>start</role>
+   </port>
+   <port>
+    <name>done</name>
+    <direction>Output</direction>
+    <width>1</width>
+    <role>done</role>
+   </port>
+   <port>
+    <name>x_start</name>
+    <direction>Input</direction>
+    <width>16</width>
+    <role>x_start</role>
+   </port>
+   <port>
+    <name>x_length</name>
+    <direction>Input</direction>
+    <width>16</width>
+    <role>x_length</role>
+   </port>
+   <port>
+    <name>y_start</name>
+    <direction>Input</direction>
+    <width>16</width>
+    <role>y_start</role>
+   </port>
+   <port>
+    <name>y_length</name>
+    <direction>Input</direction>
+    <width>16</width>
+    <role>y_length</role>
+   </port>
+   <port>
+    <name>current_x</name>
+    <direction>Output</direction>
+    <width>16</width>
+    <role>current_x</role>
+   </port>
+   <port>
+    <name>current_y</name>
+    <direction>Output</direction>
+    <width>16</width>
+    <role>current_y</role>
+   </port>
+   <port>
+    <name>old_color</name>
+    <direction>Output</direction>
+    <width>32</width>
+    <role>old_color</role>
+   </port>
+   <port>
+    <name>new_color</name>
+    <direction>Input</direction>
+    <width>32</width>
+    <role>new_color</role>
+   </port>
+  </interface>
+ </module>
+ <module
+   name="sys_clk_bridge"
+   kind="altera_clock_bridge"
+   version="18.1"
+   path="sys_clk_bridge">
+  <!-- Describes a single module. Module parameters are
+the requested settings for a module instance. -->
+  <parameter name="DERIVED_CLOCK_RATE">
+   <type>long</type>
+   <value>143000000</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+   <sysinfo_type>CLOCK_RATE</sysinfo_type>
+   <sysinfo_arg>in_clk</sysinfo_arg>
+  </parameter>
+  <parameter name="EXPLICIT_CLOCK_RATE">
+   <type>long</type>
+   <value>0</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="NUM_CLOCK_OUTPUTS">
+   <type>int</type>
+   <value>1</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <interface name="in_clk" kind="clock_sink" version="18.1">
+   <!-- The connection points exposed by a module instance for the
+particular module parameters. Connection points and their
+parameters are a RESULT of the module parameters. -->
+   <parameter name="externallyDriven">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="ptfSchematicName">
+    <type>java.lang.String</type>
+    <value></value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="deviceFamily">
+    <type>java.lang.String</type>
+    <value>UNKNOWN</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="generateLegacySim">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="clockRateKnown">
+    <type>java.lang.Boolean</type>
+    <value>true</value>
+    <derived>true</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="clockRate">
+    <type>java.lang.Long</type>
+    <value>143000000</value>
+    <derived>true</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <type>clock</type>
+   <isStart>false</isStart>
+   <port>
+    <name>in_clk</name>
+    <direction>Input</direction>
+    <width>1</width>
+    <role>clk</role>
+   </port>
+  </interface>
+  <interface name="out_clk" kind="clock_source" version="18.1">
+   <!-- The connection points exposed by a module instance for the
+particular module parameters. Connection points and their
+parameters are a RESULT of the module parameters. -->
+   <parameter name="associatedDirectClock">
+    <type>java.lang.String</type>
+    <value>in_clk</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="clockRate">
+    <type>long</type>
+    <value>143000000</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="clockRateKnown">
+    <type>boolean</type>
+    <value>true</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="externallyDriven">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="ptfSchematicName">
+    <type>java.lang.String</type>
+    <value></value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="deviceFamily">
+    <type>java.lang.String</type>
+    <value>UNKNOWN</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="generateLegacySim">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <type>clock</type>
+   <isStart>true</isStart>
+   <port>
+    <name>out_clk</name>
+    <direction>Output</direction>
+    <width>1</width>
+    <role>clk</role>
+   </port>
+  </interface>
  </module>
  <module
    name="vga_controller"
@@ -2736,7 +3053,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE">
    <type>java.lang.Long</type>
-   <value>170000000</value>
+   <value>143000000</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -2817,7 +3134,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="clockRate">
     <type>java.lang.Long</type>
-    <value>170000000</value>
+    <value>143000000</value>
     <derived>true</derived>
     <enabled>true</enabled>
     <visible>false</visible>
@@ -3354,7 +3671,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="AUTO_CLK_CLOCK_RATE">
    <type>java.lang.Long</type>
-   <value>170000000</value>
+   <value>143000000</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -3425,7 +3742,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="clockRate">
     <type>java.lang.Long</type>
-    <value>170000000</value>
+    <value>143000000</value>
     <derived>true</derived>
     <enabled>true</enabled>
     <visible>false</visible>
@@ -4745,7 +5062,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="AUTO_CLK_CLOCK_RATE">
    <type>java.lang.Long</type>
-   <value>170000000</value>
+   <value>143000000</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -4816,7 +5133,7 @@ parameters are a RESULT of the module parameters. -->
    </parameter>
    <parameter name="clockRate">
     <type>java.lang.Long</type>
-    <value>170000000</value>
+    <value>143000000</value>
     <derived>true</derived>
     <enabled>true</enabled>
     <visible>false</visible>
@@ -5895,6 +6212,33 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>clock_stream_in</endConnectionPoint>
  </connection>
  <connection
+   name="main_pll.sys_clk/sys_clk_bridge.in_clk"
+   kind="clock"
+   version="18.1"
+   start="main_pll.sys_clk"
+   end="sys_clk_bridge.in_clk">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>main_pll</startModule>
+  <startConnectionPoint>sys_clk</startConnectionPoint>
+  <endModule>sys_clk_bridge</endModule>
+  <endConnectionPoint>in_clk</endConnectionPoint>
+ </connection>
+ <connection
    name="vga_pll.vga_clk/vga_controller.clk"
    kind="clock"
    version="18.1"
@@ -5949,33 +6293,6 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>clock_stream_out</endConnectionPoint>
  </connection>
  <connection
-   name="main_pll.reset_source/sdram_controller.reset"
-   kind="reset"
-   version="18.1"
-   start="main_pll.reset_source"
-   end="sdram_controller.reset">
-  <parameter name="deviceFamily">
-   <type>java.lang.String</type>
-   <value>UNKNOWN</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <parameter name="generateLegacySim">
-   <type>boolean</type>
-   <value>false</value>
-   <derived>false</derived>
-   <enabled>true</enabled>
-   <visible>true</visible>
-   <valid>true</valid>
-  </parameter>
-  <startModule>main_pll</startModule>
-  <startConnectionPoint>reset_source</startConnectionPoint>
-  <endModule>sdram_controller</endModule>
-  <endConnectionPoint>reset</endConnectionPoint>
- </connection>
- <connection
    name="vga_pll.reset_source/vga_controller.reset"
    kind="reset"
    version="18.1"
@@ -6003,11 +6320,11 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>reset</endConnectionPoint>
  </connection>
  <connection
-   name="main_pll.reset_source/vga_rgb_resampler.reset"
+   name="main_pll.reset_source/sdram_interface.reset"
    kind="reset"
    version="18.1"
    start="main_pll.reset_source"
-   end="vga_rgb_resampler.reset">
+   end="sdram_interface.reset">
   <parameter name="deviceFamily">
    <type>java.lang.String</type>
    <value>UNKNOWN</value>
@@ -6026,7 +6343,34 @@ parameters are a RESULT of the module parameters. -->
   </parameter>
   <startModule>main_pll</startModule>
   <startConnectionPoint>reset_source</startConnectionPoint>
-  <endModule>vga_rgb_resampler</endModule>
+  <endModule>sdram_interface</endModule>
+  <endConnectionPoint>reset</endConnectionPoint>
+ </connection>
+ <connection
+   name="main_pll.reset_source/sdram_controller.reset"
+   kind="reset"
+   version="18.1"
+   start="main_pll.reset_source"
+   end="sdram_controller.reset">
+  <parameter name="deviceFamily">
+   <type>java.lang.String</type>
+   <value>UNKNOWN</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <parameter name="generateLegacySim">
+   <type>boolean</type>
+   <value>false</value>
+   <derived>false</derived>
+   <enabled>true</enabled>
+   <visible>true</visible>
+   <valid>true</valid>
+  </parameter>
+  <startModule>main_pll</startModule>
+  <startConnectionPoint>reset_source</startConnectionPoint>
+  <endModule>sdram_controller</endModule>
   <endConnectionPoint>reset</endConnectionPoint>
  </connection>
  <connection
@@ -6057,11 +6401,11 @@ parameters are a RESULT of the module parameters. -->
   <endConnectionPoint>reset</endConnectionPoint>
  </connection>
  <connection
-   name="main_pll.reset_source/sdram_interface.reset"
+   name="main_pll.reset_source/vga_rgb_resampler.reset"
    kind="reset"
    version="18.1"
    start="main_pll.reset_source"
-   end="sdram_interface.reset">
+   end="vga_rgb_resampler.reset">
   <parameter name="deviceFamily">
    <type>java.lang.String</type>
    <value>UNKNOWN</value>
@@ -6080,7 +6424,7 @@ parameters are a RESULT of the module parameters. -->
   </parameter>
   <startModule>main_pll</startModule>
   <startConnectionPoint>reset_source</startConnectionPoint>
-  <endModule>sdram_interface</endModule>
+  <endModule>vga_rgb_resampler</endModule>
   <endConnectionPoint>reset</endConnectionPoint>
  </connection>
  <connection
@@ -6146,7 +6490,7 @@ parameters are a RESULT of the module parameters. -->
   <version>18.0</version>
  </plugin>
  <plugin>
-  <instanceCount>9</instanceCount>
+  <instanceCount>10</instanceCount>
   <name>clock_sink</name>
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IMutableConnectionPoint</subtype>
@@ -6162,7 +6506,7 @@ parameters are a RESULT of the module parameters. -->
   <version>18.1</version>
  </plugin>
  <plugin>
-  <instanceCount>3</instanceCount>
+  <instanceCount>4</instanceCount>
   <name>clock_source</name>
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IMutableConnectionPoint</subtype>
@@ -6194,7 +6538,7 @@ parameters are a RESULT of the module parameters. -->
   <version>18.1</version>
  </plugin>
  <plugin>
-  <instanceCount>2</instanceCount>
+  <instanceCount>3</instanceCount>
   <name>conduit_end</name>
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IMutableConnectionPoint</subtype>
@@ -6215,6 +6559,14 @@ parameters are a RESULT of the module parameters. -->
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IMutableConnectionPoint</subtype>
   <displayName>Avalon Memory Mapped Master</displayName>
+  <version>18.1</version>
+ </plugin>
+ <plugin>
+  <instanceCount>1</instanceCount>
+  <name>altera_clock_bridge</name>
+  <type>com.altera.entityinterfaces.IElementClass</type>
+  <subtype>com.altera.entityinterfaces.IModule</subtype>
+  <displayName>Clock Bridge</displayName>
   <version>18.1</version>
  </plugin>
  <plugin>
@@ -6290,7 +6642,7 @@ parameters are a RESULT of the module parameters. -->
   <version>18.1</version>
  </plugin>
  <plugin>
-  <instanceCount>7</instanceCount>
+  <instanceCount>8</instanceCount>
   <name>clock</name>
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IConnection</subtype>

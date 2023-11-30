@@ -105,6 +105,30 @@
          type = "String";
       }
    }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
    element main_pll
    {
       datum _sortIndex
@@ -117,7 +141,7 @@
    {
       datum _sortIndex
       {
-         value = "3";
+         value = "4";
          type = "int";
       }
    }
@@ -125,35 +149,11 @@
    {
       datum _sortIndex
       {
-         value = "2";
+         value = "3";
          type = "int";
       }
    }
-   element vga_controller
-   {
-      datum _sortIndex
-      {
-         value = "7";
-         type = "int";
-      }
-   }
-   element vga_fifo
-   {
-      datum _sortIndex
-      {
-         value = "6";
-         type = "int";
-      }
-   }
-   element vga_pixel_buffer_dma
-   {
-      datum _sortIndex
-      {
-         value = "4";
-         type = "int";
-      }
-   }
-   element vga_pll
+   element sys_clk_bridge
    {
       datum _sortIndex
       {
@@ -161,11 +161,43 @@
          type = "int";
       }
    }
-   element vga_rgb_resampler
+   element vga_controller
+   {
+      datum _sortIndex
+      {
+         value = "8";
+         type = "int";
+      }
+   }
+   element vga_fifo
+   {
+      datum _sortIndex
+      {
+         value = "7";
+         type = "int";
+      }
+   }
+   element vga_pixel_buffer_dma
    {
       datum _sortIndex
       {
          value = "5";
+         type = "int";
+      }
+   }
+   element vga_pll
+   {
+      datum _sortIndex
+      {
+         value = "2";
+         type = "int";
+      }
+   }
+   element vga_rgb_resampler
+   {
+      datum _sortIndex
+      {
+         value = "6";
          type = "int";
       }
    }
@@ -201,6 +233,16 @@
    type="clock"
    dir="start" />
  <interface name="sdram_interface_color" internal="sdram_interface.color" />
+ <interface
+   name="sdram_interface_ext_interface"
+   internal="sdram_interface.ext_interface"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="sys_clk_bridge_out_clk"
+   internal="sys_clk_bridge.out_clk"
+   type="clock"
+   dir="start" />
  <interface name="sys_ref_clk" internal="main_pll.ref_clk" type="clock" dir="end" />
  <interface
    name="sys_ref_reset"
@@ -230,7 +272,7 @@
   <parameter name="CV_boards" value="DE1-SoC" />
   <parameter name="MAX10_boards" value="DE10-Lite" />
   <parameter name="device_family" value="Cyclone V" />
-  <parameter name="gui_outclk" value="170.0" />
+  <parameter name="gui_outclk" value="143.0" />
   <parameter name="gui_refclk" value="50.0" />
   <parameter name="other_boards" value="None" />
  </module>
@@ -239,14 +281,14 @@
    kind="altera_avalon_new_sdram_controller"
    version="18.1"
    enabled="1">
-  <parameter name="TAC" value="5.5" />
+  <parameter name="TAC" value="5.4" />
   <parameter name="TMRD" value="3" />
-  <parameter name="TRCD" value="20.0" />
+  <parameter name="TRCD" value="15.0" />
   <parameter name="TRFC" value="70.0" />
-  <parameter name="TRP" value="20.0" />
+  <parameter name="TRP" value="15.0" />
   <parameter name="TWR" value="14.0" />
   <parameter name="casLatency" value="3" />
-  <parameter name="clockRate" value="170000000" />
+  <parameter name="clockRate" value="143000000" />
   <parameter name="columnWidth" value="10" />
   <parameter name="componentName">$${FILENAME}_sdram_controller</parameter>
   <parameter name="dataWidth" value="16" />
@@ -259,7 +301,7 @@
   <parameter name="numberOfChipSelects" value="1" />
   <parameter name="pinsSharedViaTriState" value="false" />
   <parameter name="powerUpDelay" value="100.0" />
-  <parameter name="refreshPeriod" value="15.625" />
+  <parameter name="refreshPeriod" value="7.8125" />
   <parameter name="registerDataIn" value="true" />
   <parameter name="rowWidth" value="13" />
  </module>
@@ -268,7 +310,20 @@
    kind="sdram_interface"
    version="1.1"
    enabled="1">
-  <parameter name="DATA_WIDTH" value="32" />
+  <parameter name="ADDR_WIDTH" value="32" />
+  <parameter name="BASE_ADDR_OFFSET" value="0" />
+  <parameter name="COLOR_WIDTH" value="32" />
+  <parameter name="COORD_WIDTH" value="16" />
+  <parameter name="FIFO_DEPTH" value="32" />
+ </module>
+ <module
+   name="sys_clk_bridge"
+   kind="altera_clock_bridge"
+   version="18.1"
+   enabled="1">
+  <parameter name="DERIVED_CLOCK_RATE" value="143000000" />
+  <parameter name="EXPLICIT_CLOCK_RATE" value="0" />
+  <parameter name="NUM_CLOCK_OUTPUTS" value="1" />
  </module>
  <module
    name="vga_controller"
@@ -287,7 +342,7 @@
    kind="altera_up_avalon_video_dual_clock_buffer"
    version="18.0"
    enabled="1">
-  <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE" value="170000000" />
+  <parameter name="AUTO_CLOCK_STREAM_IN_CLOCK_RATE" value="143000000" />
   <parameter name="AUTO_CLOCK_STREAM_OUT_CLOCK_RATE" value="25000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
   <parameter name="color_bits" value="10" />
@@ -298,7 +353,7 @@
    kind="altera_up_avalon_video_pixel_buffer_dma"
    version="18.0"
    enabled="1">
-  <parameter name="AUTO_CLK_CLOCK_RATE" value="170000000" />
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="143000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
   <parameter name="addr_mode" value="Consecutive" />
   <parameter name="back_start_address" value="0" />
@@ -328,7 +383,7 @@
    kind="altera_up_avalon_video_rgb_resampler"
    version="18.0"
    enabled="1">
-  <parameter name="AUTO_CLK_CLOCK_RATE" value="170000000" />
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="143000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
   <parameter name="alpha" value="1023" />
   <parameter name="input_type" value="32-bit RGBA" />
@@ -404,6 +459,11 @@
  <connection
    kind="clock"
    version="18.1"
+   start="main_pll.sys_clk"
+   end="sys_clk_bridge.in_clk" />
+ <connection
+   kind="clock"
+   version="18.1"
    start="vga_pll.vga_clk"
    end="vga_controller.clk" />
  <connection
@@ -414,18 +474,18 @@
  <connection
    kind="reset"
    version="18.1"
-   start="main_pll.reset_source"
-   end="sdram_controller.reset" />
- <connection
-   kind="reset"
-   version="18.1"
    start="vga_pll.reset_source"
    end="vga_controller.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="main_pll.reset_source"
-   end="vga_rgb_resampler.reset" />
+   end="sdram_interface.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="main_pll.reset_source"
+   end="sdram_controller.reset" />
  <connection
    kind="reset"
    version="18.1"
@@ -435,7 +495,7 @@
    kind="reset"
    version="18.1"
    start="main_pll.reset_source"
-   end="sdram_interface.reset" />
+   end="vga_rgb_resampler.reset" />
  <connection
    kind="reset"
    version="18.1"
