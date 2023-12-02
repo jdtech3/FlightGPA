@@ -62,7 +62,7 @@ module FlightGPA (
         .vga_VS                 (VGA_VS),
         .vga_R                  (VGA_R),
         .vga_G                  (VGA_G),
-        .vga_B                  (VGA_B),
+        .vga_B                  (VGA_B)
 
 	);
 	
