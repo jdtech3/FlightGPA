@@ -158,6 +158,7 @@ module sdram_interface #(
             MODULE_PIXEL_FLUSHING:      module_next_state = (writer_current_state == SDRAM_WRITER_DONE) ? MODULE_PIXEL_DONE : MODULE_PIXEL_FLUSHING;
             MODULE_PIXEL_DONE:          module_next_state = MODULE_PIXEL_START;
             MODULE_DONE:                module_next_state = MODULE_IDLE;
+            default:                    module_next_state = MODULE_IDLE;
         endcase
     end
 
