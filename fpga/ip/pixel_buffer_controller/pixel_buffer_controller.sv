@@ -16,8 +16,8 @@
 */
 
 module pixel_buffer_controller #(
-    parameter BASE_ADDR_OFFSET = 16'h0000,
-    parameter ADDR_WIDTH = 16
+    parameter BASE_ADDR_OFFSET = 4'h0,
+    parameter ADDR_WIDTH = 4
 )
 (
     input wire clk,
@@ -33,4 +33,40 @@ module pixel_buffer_controller #(
     input logic                     avm_waitrequest
 );
 
+    // --- FSM state enums ---
+
+    typedef enum bit [3:0] { 
+        MODULE_IDLE,
+        MODULE_WAIT,
+        MODULE_WRITE,
+        MODULE_DONE
+    } module_state_t;
+
+    // --- Signals ---
+
+    module_state_t module_current_state;
+    module_state_t module_next_state;
+
+    // --- Logic ---
+
+    always_comb begin
+        case (module_current_state)
+            MODULE_IDLE:    module_next_state = swap_buffer ? (avm_waitrequest ? MODULE_WAIT : MODULE_WRITE) : MODULE_IDLE;
+            MODULE_WAIT:    module_next_state = avm_waitrequest ? MODULE_WAIT : MODULE_WRITE;
+            MODULE_WRITE:   module_next_state = MODULE_DONE;
+            MODULE_DONE:    module_next_state = MODULE_IDLE;
+            default:        module_next_state = MODULE_IDLE;
+        endcase
+    end
+
+    always_ff @ (posedge clk) begin
+        module_current_state <= reset ? MODULE_IDLE : module_next_state;
+    end
+
+    always_comb begin
+        avm_address = BASE_ADDR_OFFSET;     // buffer register is at offset 0
+        avm_writedata = 0;                  // dummy data, doesn't matter
+        
+        avm_write = module_current_state == MODULE_WRITE;
+    end
 endmodule

@@ -129,11 +129,67 @@
          type = "String";
       }
    }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
    element main_pll
    {
       datum _sortIndex
       {
          value = "0";
+         type = "int";
+      }
+   }
+   element pixel_buffer_controller
+   {
+      datum _sortIndex
+      {
+         value = "5";
          type = "int";
       }
    }
@@ -165,7 +221,7 @@
    {
       datum _sortIndex
       {
-         value = "8";
+         value = "9";
          type = "int";
       }
    }
@@ -173,7 +229,7 @@
    {
       datum _sortIndex
       {
-         value = "7";
+         value = "8";
          type = "int";
       }
    }
@@ -181,7 +237,7 @@
    {
       datum _sortIndex
       {
-         value = "5";
+         value = "6";
          type = "int";
       }
    }
@@ -197,7 +253,7 @@
    {
       datum _sortIndex
       {
-         value = "6";
+         value = "7";
          type = "int";
       }
    }
@@ -222,6 +278,11 @@
  <parameter name="timeStamp" value="0" />
  <parameter name="useTestBenchNamingPattern" value="false" />
  <instanceScript></instanceScript>
+ <interface
+   name="pixel_buffer_controller_ext_interface"
+   internal="pixel_buffer_controller.ext_interface"
+   type="conduit"
+   dir="end" />
  <interface
    name="sdram"
    internal="sdram_controller.wire"
@@ -254,11 +315,6 @@
    internal="vga_controller.external_interface"
    type="conduit"
    dir="end" />
- <interface
-   name="vga_pixel_buffer_dma_avalon_control_slave"
-   internal="vga_pixel_buffer_dma.avalon_control_slave"
-   type="avalon"
-   dir="end" />
  <interface name="vga_ref_clk" internal="vga_pll.ref_clk" type="clock" dir="end" />
  <interface
    name="vga_ref_reset"
@@ -280,6 +336,14 @@
   <parameter name="gui_outclk" value="143.0" />
   <parameter name="gui_refclk" value="50.0" />
   <parameter name="other_boards" value="None" />
+ </module>
+ <module
+   name="pixel_buffer_controller"
+   kind="pixel_buffer_controller"
+   version="1.0"
+   enabled="1">
+  <parameter name="ADDR_WIDTH" value="4" />
+  <parameter name="BASE_ADDR_OFFSET" value="0" />
  </module>
  <module
    name="sdram_controller"
@@ -361,7 +425,7 @@
   <parameter name="AUTO_CLK_CLOCK_RATE" value="143000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
   <parameter name="addr_mode" value="Consecutive" />
-  <parameter name="back_start_address" value="0" />
+  <parameter name="back_start_address" value="1228800" />
   <parameter name="color_space" value="32-bit RGBA" />
   <parameter name="image_height" value="480" />
   <parameter name="image_width" value="640" />
@@ -399,6 +463,15 @@
    version="18.1"
    start="vga_pixel_buffer_dma.avalon_pixel_dma_master"
    end="sdram_controller.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="pixel_buffer_controller.avm"
+   end="vga_pixel_buffer_dma.avalon_control_slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0000" />
   <parameter name="defaultConnection" value="false" />
@@ -460,6 +533,11 @@
    kind="clock"
    version="18.1"
    start="main_pll.sys_clk"
+   end="pixel_buffer_controller.clock" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="main_pll.sys_clk"
    end="vga_fifo.clock_stream_in" />
  <connection
    kind="clock"
@@ -501,6 +579,11 @@
    version="18.1"
    start="main_pll.reset_source"
    end="vga_rgb_resampler.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="main_pll.reset_source"
+   end="pixel_buffer_controller.reset" />
  <connection
    kind="reset"
    version="18.1"
