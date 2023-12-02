@@ -1,0 +1,36 @@
+vlib work
+
+vlog \
+    ../src/graphics/*.v \
+    ../src/graphics/*.sv \
+    ../src/utils/*.v \
+    ../src/utils/math/*.v \
+    ../src/utils/math/*.sv \
+    ../ip/block_ram/*.v \
+    ../ip/float/*.v
+vsim -L altera_mf_ver -L lpm_ver pipe_airplane_vertices -t 1ns
+
+log {/*}
+add wave {/*}
+add wave {/pipe_airplane_vertices/pipe_vertices_inst/*}
+add wave {/pipe_airplane_vertices/airplane_mesh_isnt/*}
+add wave {/pipe_airplane_vertices/mvp_output_inst/*}
+
+force {clock} 0, 1 5ns -r 10ns
+force {reset} 1, 0 10ns
+
+force {update_mvp} 1
+
+force {start} 0, 1 10ns, 0 20ns
+force {roll} 32'h3f060a92
+force {pitch} 32'h3f490fdb
+force {yaw} 32'h3f060a92
+force {x} 0
+force {y} 0
+force {z} 0
+run 3200ns
+
+force {update_mvp} 0
+
+force {start} 0, 1 10ns, 0 20ns
+run 10000ns
