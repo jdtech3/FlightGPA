@@ -44,7 +44,7 @@ module draw(
 
 	wire draw_done_by_opcode [OPCODE_WIDTH-1:0];
 	wire screen_start_by_opcode [OPCODE_WIDTH-1:0];
-	wire [WIDTH-1:0] new_screen_colour_by_opcode [OPCODE_WIDTH-1:0];
+	wire [COLOUR_WIDTH-1:0] new_screen_colour_by_opcode [OPCODE_WIDTH-1:0];
 	wire [WIDTH-1:0] screen_x_min_by_opcode [OPCODE_WIDTH-1:0];
 	wire [WIDTH-1:0] screen_y_min_by_opcode [OPCODE_WIDTH-1:0];
 	wire [WIDTH-1:0] screen_x_range_by_opcode [OPCODE_WIDTH-1:0];
