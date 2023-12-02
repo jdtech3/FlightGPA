@@ -45,7 +45,7 @@ module sdram_interface #(
     // Current pixel
     output wire [COORD_WIDTH-1:0]   current_x,
     output wire [COORD_WIDTH-1:0]   current_y,
-    output wire [COLOR_WIDTH-1:0]   old_color,  // old color read
+    output reg [COLOR_WIDTH-1:0]    old_color,  // old color read
     input wire [COLOR_WIDTH-1:0]    new_color,  // new color to write
 
 
@@ -53,12 +53,14 @@ module sdram_interface #(
     output logic [ADDR_WIDTH-1:0]   wm_address,
     output logic [COLOR_WIDTH-1:0]  wm_writedata,
     output logic                    wm_write,
+    output logic [3:0]              wm_byteenable,
     input logic                     wm_waitrequest,
 
     // Avalon master I/O for reader 
     output logic [ADDR_WIDTH-1:0]   rm_address,
     input logic [COLOR_WIDTH-1:0]   rm_readdata,
     output logic                    rm_read,
+    output logic [3:0]              rm_byteenable,
     input logic                     rm_readdatavalid,
     input logic                     rm_waitrequest
 
@@ -232,12 +234,10 @@ module sdram_interface #(
         .end_of_grid(pixel_counter_done)
     );
     
-	burst_read_master #(
+	latency_aware_read_master #(
         .DATAWIDTH(COLOR_WIDTH),
 		.FIFODEPTH(FIFO_DEPTH),
-		.FIFODEPTH_LOG2($clog2(FIFO_DEPTH)),
-        .MAXBURSTCOUNT(1),      // we don't use bursting
-        .BURSTCOUNTWIDTH(1)
+		.FIFODEPTH_LOG2($clog2(FIFO_DEPTH))
 	) reader (
 		.clk(clk),
 		.reset(reset),
@@ -254,6 +254,7 @@ module sdram_interface #(
 
 		.master_address(rm_address),
 		.master_read(rm_read),
+        .master_byteenable(rm_byteenable),
 		.master_readdata(rm_readdata),
 		.master_readdatavalid(rm_readdatavalid),
 		.master_waitrequest(rm_waitrequest)
@@ -279,6 +280,7 @@ module sdram_interface #(
         
         .master_address(wm_address),
         .master_write(wm_write),
+        .master_byteenable(wm_byteenable),
         .master_writedata(wm_writedata),
         .master_waitrequest(wm_waitrequest)
     );
