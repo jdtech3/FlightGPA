@@ -254,6 +254,11 @@
    internal="vga_controller.external_interface"
    type="conduit"
    dir="end" />
+ <interface
+   name="vga_pixel_buffer_dma_avalon_control_slave"
+   internal="vga_pixel_buffer_dma.avalon_control_slave"
+   type="avalon"
+   dir="end" />
  <interface name="vga_ref_clk" internal="vga_pll.ref_clk" type="clock" dir="end" />
  <interface
    name="vga_ref_reset"

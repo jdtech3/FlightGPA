@@ -124,6 +124,8 @@ module sdram_interface #(
 
     // Memory
     logic [ADDR_WIDTH-1:0] base_address;
+    logic [ADDR_WIDTH-1:0] base_address_read;
+    logic [ADDR_WIDTH-1:0] base_address_write;
 
     // Reader
     logic reader_go;
@@ -147,6 +149,8 @@ module sdram_interface #(
     assign current_x = x_start + current_dx;
     assign current_y = y_start + current_dy;
     assign base_address = BASE_ADDR_OFFSET + ( (current_y * 640 + current_x) * 4 );
+    assign base_address_read = base_address;
+    assign base_address_write = base_address;
 
     always_comb begin
         case (module_current_state)
@@ -243,7 +247,7 @@ module sdram_interface #(
 		.reset(reset),
 
         .control_fixed_location(1'b0),
-        .control_read_base(base_address),
+        .control_read_base(base_address_read),
         .control_read_length(COLOR_WIDTH/8),    // in bytes
         .control_go(reader_go),
         .control_done(reader_done),
@@ -269,7 +273,7 @@ module sdram_interface #(
         .reset(reset),
         
         .control_fixed_location(1'b0),
-        .control_write_base(base_address),
+        .control_write_base(base_address_write),
         .control_write_length(COLOR_WIDTH/8),   // in bytes
         .control_go(writer_go),
         .control_done(writer_done),
@@ -281,8 +285,14 @@ module sdram_interface #(
         .master_address(wm_address),
         .master_write(wm_write),
         .master_byteenable(wm_byteenable),
-        .master_writedata(wm_writedata),
+        // .master_writedata(wm_writedata),     // write_master FIFO bypass!!
         .master_waitrequest(wm_waitrequest)
     );
+
+    assign wm_writedata = new_color;    // write_master FIFO bypass!!
+
+    // NOTE: write_master FIFO bypass is workaround for issue that somehow data coming out of the writer's Avalon data
+    //       data line (master_writedata) don't correspond to our input data (user_write_buffer). Being 0x80 addresses off.
+    //       This happens even when FIFO_DEPTH = 1, very odd.
     
 endmodule
