@@ -185,6 +185,14 @@
          type = "String";
       }
    }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
    element hps
    {
       datum _sortIndex
@@ -318,13 +326,17 @@
  <parameter name="timeStamp" value="0" />
  <parameter name="useTestBenchNamingPattern" value="false" />
  <instanceScript></instanceScript>
- <interface name="memory" internal="hps.memory" type="conduit" dir="end" />
+ <interface name="memory" internal="hps.memory" />
  <interface
    name="pixel_buffer_controller_ext_interface"
    internal="pixel_buffer_controller.ext_interface"
    type="conduit"
    dir="end" />
- <interface name="sdram" internal="sdram_controller.wire" />
+ <interface
+   name="sdram"
+   internal="sdram_controller.wire"
+   type="conduit"
+   dir="end" />
  <interface
    name="sdram_clk"
    internal="main_pll.sdram_clk"
@@ -358,7 +370,7 @@
    internal="vga_pll.ref_reset"
    type="reset"
    dir="end" />
- <module name="hps" kind="altera_hps" version="18.1" enabled="1">
+ <module name="hps" kind="altera_hps" version="18.1" enabled="0">
   <parameter name="ABSTRACT_REAL_COMPARE_TEST" value="false" />
   <parameter name="ABS_RAM_MEM_INIT_FILENAME" value="meminit" />
   <parameter name="ACV_PHY_CLK_ADD_FR_PHASE" value="0.0" />
@@ -933,7 +945,7 @@
    name="sdram_controller"
    kind="altera_avalon_new_sdram_controller"
    version="18.1"
-   enabled="0">
+   enabled="1">
   <parameter name="TAC" value="5.4" />
   <parameter name="TMRD" value="3" />
   <parameter name="TRCD" value="15.0" />
@@ -941,9 +953,9 @@
   <parameter name="TRP" value="15.0" />
   <parameter name="TWR" value="14.0" />
   <parameter name="casLatency" value="3" />
-  <parameter name="clockRate" value="166000000" />
+  <parameter name="clockRate" value="50000000" />
   <parameter name="columnWidth" value="10" />
-  <parameter name="componentName">FlightGPA_System_sdram_controller</parameter>
+  <parameter name="componentName">$${FILENAME}_sdram_controller</parameter>
   <parameter name="dataWidth" value="16" />
   <parameter name="generateSimulationModel" value="true" />
   <parameter name="initNOPDelay" value="0.0" />
@@ -1039,6 +1051,15 @@
  <connection
    kind="avalon"
    version="18.1"
+   start="pixel_dma.avalon_dma_master"
+   end="sdram_controller.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
    start="pixel_buffer_controller.avm"
    end="pixel_dma.avalon_dma_control_slave">
   <parameter name="arbitrationPriority" value="1" />
@@ -1057,8 +1078,26 @@
  <connection
    kind="avalon"
    version="18.1"
+   start="sdram_interface.rm"
+   end="sdram_controller.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
    start="sdram_interface.wm"
    end="hps.f2h_sdram0_data">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="sdram_interface.wm"
+   end="sdram_controller.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0000" />
   <parameter name="defaultConnection" value="false" />
@@ -1093,6 +1132,11 @@
    version="18.1"
    start="main_pll.sys_clk"
    end="pixel_dma.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="main_pll.sys_clk"
+   end="sdram_controller.clk" />
  <connection
    kind="clock"
    version="18.1"
@@ -1223,6 +1267,11 @@
    version="18.1"
    start="vga_pll.reset_source"
    end="vga_rgb_resampler.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="main_pll.reset_source"
+   end="sdram_controller.reset" />
  <connection
    kind="reset"
    version="18.1"
