@@ -19,8 +19,6 @@
 */
 
 module sdram_interface #(
-    parameter BASE_ADDR_OFFSET = 32'h00000000,
-
     // The following are all supposed to be private localparams,
     // but Quartus Lite does not support localparams in parameter initialization list :/
     parameter COLOR_WIDTH = 32,
@@ -35,6 +33,7 @@ module sdram_interface #(
     // Control
     input wire start,
     output wire done,
+    input wire [ADDR_WIDTH-1:0]     base_addr_offset,   // which buffer to write to
 
     // Bounds
     input wire [COORD_WIDTH-1:0]    x_start,
@@ -146,7 +145,7 @@ module sdram_interface #(
 
     assign current_x = x_start + current_dx;
     assign current_y = y_start + current_dy;
-    assign base_address = BASE_ADDR_OFFSET + ( (current_y * 640 + current_x) * 4 );
+    assign base_address = base_addr_offset + ( (current_y * 640 + current_x) * 4 );
 
     always_comb begin
         case (module_current_state)

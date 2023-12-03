@@ -31,7 +31,13 @@ module sdram_draw_test(
     // I/O
     input   [3:0]   KEY,
     input   [9:0]   SW,
-    output  [9:0]   LEDR
+    output  [9:0]   LEDR,
+	output 	[6:0]	HEX0,
+	output 	[6:0]	HEX1,
+	output 	[6:0]	HEX2,
+	output 	[6:0]	HEX3,
+	output 	[6:0]	HEX4,
+	output 	[6:0]	HEX5
 );
 
 	wire sys_clk;
@@ -39,7 +45,7 @@ module sdram_draw_test(
     wire reset;
     wire pulse_1s;
 
-    assign reset = ~KEY[2];
+    assign reset = ~KEY[0];
 
     pulse #(
         .DURATION(1000),
@@ -64,6 +70,9 @@ module sdram_draw_test(
 	reg [15:0] ax, ay, bx, by, cx, cy;
 	reg [31:0] colour;
 
+	reg [31:0] current_buffer_addr;
+	reg swap_buffer;
+
 	wire screen_start;
 	wire [31:0] old_screen_colour; 
 	wire [31:0] new_screen_colour;
@@ -77,7 +86,8 @@ module sdram_draw_test(
 		S_START_CLEAR = 1,
 		S_WAIT_CLEAR = 2,
 		S_START_TRIANGLE = 3,
-		S_WAIT_TRIANGLE = 4;
+		S_WAIT_TRIANGLE = 4,
+		S_SWAP_BUFFER = 5;
 
 	always @(*) begin
 		case(current_state)
@@ -85,7 +95,8 @@ module sdram_draw_test(
 			S_START_CLEAR: next_state = S_WAIT_CLEAR;
 			S_WAIT_CLEAR: next_state = drawer_done ? S_START_TRIANGLE : S_WAIT_CLEAR;
 			S_START_TRIANGLE: next_state = S_WAIT_TRIANGLE;
-			S_WAIT_TRIANGLE: next_state = drawer_done ? S_WAIT : S_WAIT_TRIANGLE;
+			S_WAIT_TRIANGLE: next_state = drawer_done ? S_SWAP_BUFFER : S_WAIT_TRIANGLE;
+			S_SWAP_BUFFER: next_state = S_WAIT;
 		endcase
 	end
 
@@ -97,25 +108,32 @@ module sdram_draw_test(
 	always @(posedge sys_clk) begin
 		drawer_en <= 0;
 		if(reset) begin
-			ax <= 16'd160; ay <= 16'd10;
-			bx <= 16'd100; by <= 16'd220;
-			cx <= 16'd220; cy <= 16'd200;
+			ax <= 16'd100; ay <= 16'd100;
+			bx <= 16'd150; by <= 16'd100;
+			cx <= 16'd100; cy <= 16'd150;
 			colour <= 0;
+			current_buffer_addr <= 32'h0012C000;
+			swap_buffer <= 1'b0;
 		end
 		else begin
 			case(current_state)
+				S_WAIT: swap_buffer <= 1'b0;
 				S_START_CLEAR: begin
 					opcode <= 0;
 					colour <= 0;
 					drawer_en <= 1;
 				end
 				S_START_TRIANGLE: begin
-					ax <= ax == 319 ? 0 : ax+1;
-					bx <= bx == 319 ? 0 : bx+1;
-					cx <= cx == 319 ? 0 : cx+1;
+					ax <= ax == 639 ? 0 : ax+1;
+					bx <= bx == 639 ? 0 : bx+1;
+					cx <= cx == 639 ? 0 : cx+1;
 					colour <= 32'hFFFF0000;
 					opcode <= 1;
 					drawer_en <= 1;
+				end
+				S_SWAP_BUFFER: begin
+					current_buffer_addr <= (current_buffer_addr == 32'h00000000) ? 32'h0012C000 : 32'h00000000;
+					swap_buffer <= 1'b1;
 				end
 			endcase
 		end
@@ -176,16 +194,29 @@ module sdram_draw_test(
         .vga_B                  (VGA_B),
 
 		// SDRAM interface signals
-		.sdram_interface_ext_interface_start		(screen_start),
-		.sdram_interface_ext_interface_done    		(screen_done),
-		.sdram_interface_ext_interface_x_start  	(screen_x_min),
-		.sdram_interface_ext_interface_x_length 	(screen_x_range),
-		.sdram_interface_ext_interface_y_start   	(screen_y_min),
-		.sdram_interface_ext_interface_y_length  	(screen_y_range),
-		.sdram_interface_ext_interface_current_x 	(screen_x),
-		.sdram_interface_ext_interface_current_y 	(screen_y),
-		.sdram_interface_ext_interface_old_color 	(old_screen_colour),
-		.sdram_interface_ext_interface_new_color 	(new_screen_colour)
+		.sdram_interface_ext_interface_start			(screen_start),
+		.sdram_interface_ext_interface_done    			(screen_done),
+		.sdram_interface_ext_interface_x_start  		(screen_x_min),
+		.sdram_interface_ext_interface_x_length 		(screen_x_range),
+		.sdram_interface_ext_interface_y_start   		(screen_y_min),
+		.sdram_interface_ext_interface_y_length  		(screen_y_range),
+		.sdram_interface_ext_interface_current_x 		(screen_x),
+		.sdram_interface_ext_interface_current_y 		(screen_y),
+		.sdram_interface_ext_interface_old_color 		(old_screen_colour),
+		.sdram_interface_ext_interface_new_color 		(new_screen_colour),
+		.sdram_interface_ext_interface_base_addr_offset	(current_buffer_addr),
+
+		// Pixel buffer controller signals
+        .pixel_buffer_controller_ext_interface_swap_buffer(swap_buffer)
 	);
+
+	// --- Hex decoders ---
+
+	hex_decoder hex5 ( .c(current_buffer_addr[23:20]), .display(HEX5) );
+	hex_decoder hex4 ( .c(current_buffer_addr[19:16]), .display(HEX4) );
+	hex_decoder hex3 ( .c(current_buffer_addr[15:12]), .display(HEX3) );
+	hex_decoder hex2 ( .c(current_buffer_addr[11:8]), .display(HEX2) );
+	hex_decoder hex1 ( .c(current_buffer_addr[7:4]), .display(HEX1) );
+	hex_decoder hex0 ( .c(current_buffer_addr[3:0]), .display(HEX0) );
 	
 endmodule
