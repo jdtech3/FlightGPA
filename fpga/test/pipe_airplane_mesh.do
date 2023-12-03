@@ -21,6 +21,9 @@ force {reset} 1, 0 10ns
 
 force {update_mvp} 1
 
+# roll: pi/6
+# pitch: pi/4
+# yaw: pi/6
 force {start} 0, 1 10ns, 0 20ns
 force {roll} 32'h3f060a92
 force {pitch} 32'h3f490fdb

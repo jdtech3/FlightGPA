@@ -1,7 +1,7 @@
 vlib work
 
 vlog ../src/graphics/mvp_matrix.sv ../src/utils/math/mat_mult4D.sv ../ip/float/float_sin.v ../ip/float/float_cos.v
-vsim -L lpm_ver mvp_matrix -t 1ns
+vsim -L lpm_ver -L altera_mf_ver mvp_matrix -t 1ns
 
 log {/*}
 add wave {/*}
@@ -51,13 +51,22 @@ force {y} 0
 force {z} 0
 run 3200ns
 
+force {start} 1, 0 10ns
+force {roll} 0
+force {pitch} 0
+force {yaw} 0
+force {x} 0
+force {y} 0
+force {z} 0
+run 3200ns
+
 force {update_mvp} 0
 
-# x: 10
-# y: -53
-# z: 29
+# x: 40
+# y: -25
+# z: -100
 force {start} 1, 0 10ns
-force {x} 32'h41200000
-force {y} 32'hc2540000
-force {z} 32'h41e80000
-run 1000ns
+force {x} 32'h42200000
+force {y} 32'hc1c80000
+force {z} 32'hc2c80000
+run 1500ns
