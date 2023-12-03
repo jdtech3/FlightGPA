@@ -8,7 +8,7 @@ vlog \
     ../src/utils/math/*.sv \
     ../ip/block_ram/*.v \
     ../ip/float/*.v
-vsim -L altera_mf_ver -L lpm_ver pipe_airplane_mesh -t 1ns
+vsim -default_radix unsigned -L altera_mf_ver -L lpm_ver pipe_airplane_mesh -t 1ns
 
 log {/*}
 add wave {/*}
@@ -21,13 +21,10 @@ force {reset} 1, 0 10ns
 
 force {update_mvp} 1
 
-# roll: pi/6
-# pitch: pi/4
-# yaw: pi/6
 force {start} 0, 1 10ns, 0 20ns
-force {roll} 32'h3f060a92
-force {pitch} 32'h3f490fdb
-force {yaw} 32'h3f060a92
+force {roll} 0
+force {pitch} 0
+force {yaw} 0
 force {x} 0
 force {y} 0
 force {z} 0

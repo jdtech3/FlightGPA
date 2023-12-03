@@ -15,7 +15,7 @@ module mvp_matrix(
     reg [31:0] cos_yaw, sin_yaw;
 
     reg [31:0] div_in;
-    wire [31:0] div_out, div_in_w;
+    wire [31:0] div_out, int_out;
 
     reg [31:0] neg_sin_roll;
     reg [31:0] neg_sin_pitch;
@@ -28,8 +28,6 @@ module mvp_matrix(
     wire mat_mult_done;
     wire count_done;
     reg [7:0] current_state, next_state;
-    
-    assign div_in_w = o[3][0];
 
     localparam
 		S_WAIT              = 8'd0,
@@ -50,7 +48,7 @@ module mvp_matrix(
         S_SAMP_Y            = 8'd15,
         S_SAMP_Z            = 8'd16;
 
-    assign count_done = (current_state == S_CALC_TRIG && count == 39) || (current_state == S_WAIT_DIV && count == 3);
+    assign count_done = (current_state == S_CALC_TRIG && count == 39) || (current_state == S_WAIT_DIV && count == 9);
     assign done = current_state == S_WAIT;
 
     assign neg_sin_roll = {~sin_roll[31], sin_roll[30:0]};
@@ -78,8 +76,16 @@ module mvp_matrix(
         .clk_en(1'b1),
         .clock(clock),
         .dataa(div_in),
-        .datab(div_in_w),
+        .datab(o[3][0]),
         .result(div_out)
+    );
+
+    float_to_int float_to_int_inst(
+        .aclr(reset),
+        .clk_en(1'b1),
+        .clock(clock),
+        .dataa(div_out),
+        .result(int_out)
     );
 
     mat_mult4D matrix_mult_inst(
@@ -183,9 +189,9 @@ module mvp_matrix(
             S_DIV_X: div_in <= o[0][0];
             S_DIV_Y: div_in <= o[1][0];
             S_DIV_Z: div_in <= o[2][0];
-            S_SAMP_X: ox <= div_out;
-            S_SAMP_Y: oy <= div_out;
-            S_SAMP_Z: oz <= div_out;
+            S_SAMP_X: ox <= int_out;
+            S_SAMP_Y: oy <= int_out;
+            S_SAMP_Z: oz <= int_out;
         endcase
     end
 
