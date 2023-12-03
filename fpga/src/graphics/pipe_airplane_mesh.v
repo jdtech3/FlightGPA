@@ -1,4 +1,4 @@
-module pipe_airplane_vertices(
+module pipe_airplane_mesh(
     input clock, reset, start, update_mvp,
     input wire [31:0] roll, pitch, yaw,
     input wire [31:0] x, y, z,
@@ -28,7 +28,7 @@ module pipe_airplane_vertices(
         .wren(mvp_wren)
     );
 
-    pipe_vertices pipe_vertices_inst(
+    mvp_pipe mvp_pipe_inst(
         .clock(clock),
         .reset(reset),
         .start(start),

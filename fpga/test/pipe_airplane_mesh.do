@@ -8,13 +8,13 @@ vlog \
     ../src/utils/math/*.sv \
     ../ip/block_ram/*.v \
     ../ip/float/*.v
-vsim -L altera_mf_ver -L lpm_ver pipe_airplane_vertices -t 1ns
+vsim -L altera_mf_ver -L lpm_ver pipe_airplane_mesh -t 1ns
 
 log {/*}
 add wave {/*}
-add wave {/pipe_airplane_vertices/pipe_vertices_inst/*}
-add wave {/pipe_airplane_vertices/airplane_mesh_isnt/*}
-add wave {/pipe_airplane_vertices/mvp_output_inst/*}
+add wave {/pipe_airplane_mesh/mvp_pipe_inst/*}
+add wave {/pipe_airplane_mesh/airplane_mesh_isnt/*}
+add wave {/pipe_airplane_mesh/mvp_output_inst/*}
 
 force {clock} 0, 1 5ns -r 10ns
 force {reset} 1, 0 10ns

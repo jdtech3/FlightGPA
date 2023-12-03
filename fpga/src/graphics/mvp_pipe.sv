@@ -1,4 +1,4 @@
-module pipe_vertices(
+module mvp_pipe(
     input wire clock, reset, start, update_mvp,
     input wire [31:0] roll, pitch, yaw,
     input wire [31:0] x, y, z,
