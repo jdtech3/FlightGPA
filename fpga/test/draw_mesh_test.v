@@ -12,7 +12,7 @@ module draw_mesh_test(
 	output [7:0] VGA_B  	//	VGA Blue[9:0]
 );
 
-    wire clock, reset;
+    wire clock, reset, start;
 
     wire [31:0] mesh_addr;
     wire [31:0] mesh_data;
@@ -43,6 +43,7 @@ module draw_mesh_test(
     assign GND = 1'b0;
     assign clock = CLOCK_50;
     assign reset = ~KEY[0];
+    assign start = ~KEY[1];
 
     airplane_mesh am(
         .address(mesh_addr),
@@ -93,7 +94,7 @@ module draw_mesh_test(
     pipe_mesh_controller pmc(
         .clock(clock),
         .reset(reset),
-        .start(KEY[1]),
+        .start(start),
         .done(GND),
         .mvp_pipe_start(mvp_pipe_start),
         .mvp_pipe_update_mvp(mvp_pipe_update_mvp),

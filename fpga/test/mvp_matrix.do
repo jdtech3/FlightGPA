@@ -1,7 +1,7 @@
 vlib work
 
-vlog ../src/graphics/mvp_matrix.sv ../src/utils/math/mat_mult4D.sv ../ip/float/float_sin.v ../ip/float/float_cos.v
-vsim -L lpm_ver -L altera_mf_ver mvp_matrix -t 1ns
+vlog src/graphics/mvp_matrix.sv src/utils/math/mat_mult4D.sv ip/float/float_sin.v ip/float/float_cos.v
+vsim -default_radix decimal -L lpm_ver -L altera_mf_ver mvp_matrix -t 1ns
 
 log {/*}
 add wave {/*}
@@ -62,11 +62,11 @@ run 3200ns
 
 force {update_mvp} 0
 
-# x: 40
-# y: -25
-# z: -100
+# x: -100
+# y: 100
+# z: -500
 force {start} 1, 0 10ns
-force {x} 32'h42200000
-force {y} 32'hc1c80000
-force {z} 32'hc2c80000
+force {x} 32'hC2C80000
+force {y} 32'h42C80000
+force {z} 32'hc3fa0000
 run 1500ns

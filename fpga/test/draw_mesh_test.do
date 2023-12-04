@@ -1,15 +1,15 @@
 vlib work
 
 vlog \
-    ../src/graphics/*.v \
-    ../src/graphics/*.sv \
-    ../src/utils/*.v \
-    ../src/utils/math/*.v \
-    ../src/utils/math/*.sv \
-    ../src/vga_adapter/*.v \
-    ../ip/block_ram/*.v \
-    ../ip/float/*.v \
-    *.v
+    src/graphics/*.v \
+    src/graphics/*.sv \
+    src/utils/*.v \
+    src/utils/math/*.v \
+    src/utils/math/*.sv \
+    src/vga_adapter/*.v \
+    ip/block_ram/*.v \
+    ip/float/*.v \
+    test/*.v
 vsim -default_radix unsigned -L lpm_ver -L altera_mf_ver draw_mesh_test -t 1ns
 
 log {/*}
