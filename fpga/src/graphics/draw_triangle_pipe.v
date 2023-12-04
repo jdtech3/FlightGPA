@@ -91,8 +91,6 @@ module draw_triangle_pipe(
             end
             S_START_PIPE_DELAY:
                 mem_read_addr <= mem_read_addr+1;
-            S_RESUME_FETCH:
-                mem_read_addr <= mem_read_addr+1;
             S_FETCH_AX: begin
                 ax <= mem_read_data;
                 mem_read_addr <= mem_read_addr+1;
@@ -129,6 +127,15 @@ module draw_triangle_pipe(
                 cz <= mem_read_data;
                 colour <= mem_col_data;
                 in_count <= in_count+1;
+            end
+            S_RESUME_FETCH: begin
+                mem_read_addr <= mem_read_addr+1;
+                ax <= bx;
+                ay <= by;
+                az <= bz;
+                bx <= cx;
+                by <= cy;
+                bz <= cz;
             end
         endcase
     end
