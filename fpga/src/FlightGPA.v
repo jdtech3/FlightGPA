@@ -29,8 +29,34 @@ module FlightGPA (
     // I/O
     input   [3:0]   KEY,
     input   [9:0]   SW,
-    output  [9:0]   LEDR
+    output  [9:0]   LEDR,
+    output  [6:0]   HEX5,
+    output  [6:0]   HEX4,
+    output  [6:0]   HEX3,
+    output  [6:0]   HEX2,
+    output  [6:0]   HEX1,
+    output  [6:0]   HEX0
 );
+
+    // --- Signals ---
+
+    wire sys_clk;
+    wire sys_reset = ~KEY[0];
+    wire vga_reset = ~KEY[0];
+
+    // --- Modules ---
+
+    instrument_display instruments (
+        .clk(sys_clk), .reset(sys_reset),
+
+        .throttle('d80),
+        .heading('d350),
+        .altitude('d8214),
+        .speed('d251),
+
+        .SW(SW),
+        .HEX5(HEX5), .HEX4(HEX4), .HEX3(HEX3), .HEX2(HEX2), .HEX1(HEX1), .HEX0(HEX0)
+    );
     
     // --- Instantiating the system ---
     
@@ -38,9 +64,11 @@ module FlightGPA (
     
         // Global signals
         .sys_ref_clk_clk        (CLOCK_50),
-        .sys_ref_reset_reset    (~KEY[0]),
+        .sys_ref_reset_reset    (sys_reset),
         .vga_ref_clk_clk        (CLOCK2_50),
-        .vga_ref_reset_reset    (~KEY[1]),
+        .vga_ref_reset_reset    (vga_reset),
+
+		.sys_clk_bridge_out_clk_clk (sys_clk),
         
         // SDRAM signals
         .sdram_clk_clk          (DRAM_CLK),
@@ -65,7 +93,5 @@ module FlightGPA (
         .vga_B                  (VGA_B)
 
 	);
-	
-    assign LEDR[9:0] = {2'b00, SW[7:0]};
     
 endmodule
