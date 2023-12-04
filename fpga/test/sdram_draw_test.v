@@ -48,7 +48,7 @@ module sdram_draw_test(
     assign reset = ~KEY[0];
 
     pulse #(
-        .DURATION(1000),
+        .DURATION(100),
         .CLOCK_FREQUENCY(166000000))
     generate_pulse_1s(
         sys_clk,reset,pulse_1s
@@ -84,19 +84,18 @@ module sdram_draw_test(
 
 	localparam
 		S_WAIT = 0,
-		S_WAIT_BLANK = 1,
-		S_START_CLEAR = 2,
-		S_WAIT_CLEAR = 3,
-		S_START_TRIANGLE = 4,
-		S_WAIT_TRIANGLE = 5,
-		S_SWAP_BUFFER = 6;
+		S_START_CLEAR = 1,
+		S_WAIT_CLEAR = 2,
+		S_START_TRIANGLE = 3,
+		S_WAIT_TRIANGLE = 4,
+		S_SWAP_BUFFER = 5;
 
 	always @(*) begin
 		case(current_state)
 			S_WAIT: next_state = draw_en ? S_START_CLEAR : S_WAIT;
 			S_START_CLEAR: next_state = S_WAIT_CLEAR;
-			S_WAIT_CLEAR: next_state = drawer_done ? S_WAIT_BLANK : S_WAIT_CLEAR;
-			S_WAIT_BLANK: next_state = ~VGA_BLANK_N ? S_START_TRIANGLE : S_WAIT_BLANK;
+			S_WAIT_CLEAR: next_state = drawer_done ? S_START_TRIANGLE : S_WAIT_CLEAR;
+			// S_WAIT_BLANK: next_state = ~VGA_BLANK_N ? S_START_TRIANGLE : S_WAIT_BLANK;
 			S_START_TRIANGLE: next_state = S_WAIT_TRIANGLE;
 			S_WAIT_TRIANGLE: next_state = drawer_done ? S_SWAP_BUFFER : S_WAIT_TRIANGLE;
 			S_SWAP_BUFFER: next_state = S_WAIT;
@@ -119,11 +118,6 @@ module sdram_draw_test(
 		end
 		else begin
 			case(current_state)
-				S_START_CLEAR: begin
-					opcode <= 0;
-					colour <= 0;
-					drawer_en <= 1;
-				end
 				S_START_TRIANGLE: begin
 					ax <= ax == 639 ? 0 : ax+1;
 					bx <= bx == 639 ? 0 : bx+1;
@@ -139,7 +133,6 @@ module sdram_draw_test(
 
 	assign swap_buffer = current_state == S_SWAP_BUFFER;
 	assign screen_clear = current_state == S_START_CLEAR;
-	// assign screen_clear = 1'b0;
 
 	assign LEDR[9] = (current_state == S_WAIT_CLEAR) | (current_state == S_WAIT_TRIANGLE);	// LED to gauge when SDRAM is being accessed by us
 

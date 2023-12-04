@@ -53,7 +53,7 @@ module sdram_draw_triangle_test(
 		.ax(16'd0), .ay(16'd0),
 		.bx(16'd160), .by(16'd0),
 		.cx(16'd0), .cy(16'd160),
-		.colour(32'hFF00FF00),
+		.colour(32'hFFFF0000),
 		.draw_en(~KEY[2]),
 
 		.screen_start(screen_start),
@@ -61,8 +61,8 @@ module sdram_draw_triangle_test(
 		.screen_x_min(screen_x_min), .screen_y_min(screen_y_min),
 		.screen_x_range(screen_x_range), .screen_y_range(screen_y_range),
 		.screen_x(screen_x), .screen_y(screen_y),
-		.old_screen_colour(old_screen_colour),
-		// .old_screen_colour(32'hFF010101),           // hard code so we can see bounding box
+		// .old_screen_colour(old_screen_colour),
+		.old_screen_colour(32'hFF010101),           // hard code so we can see bounding box
 		.screen_done(screen_done)
 	);
 
@@ -110,7 +110,8 @@ module sdram_draw_triangle_test(
 		.sdram_interface_ext_interface_current_x 	(screen_x),
 		.sdram_interface_ext_interface_current_y 	(screen_y),
 		.sdram_interface_ext_interface_old_color 	(old_screen_colour),
-		.sdram_interface_ext_interface_new_color 	(new_screen_colour)
+		.sdram_interface_ext_interface_new_color 	(new_screen_colour),
+        .sdram_interface_ext_interface_base_addr_offset	(32'h00000000)
 	);
 	
 endmodule
