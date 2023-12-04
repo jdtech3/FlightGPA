@@ -326,6 +326,7 @@
  <parameter name="timeStamp" value="0" />
  <parameter name="useTestBenchNamingPattern" value="false" />
  <instanceScript></instanceScript>
+ <interface name="hps_f2h_sdram0_clock" internal="hps.f2h_sdram0_clock" />
  <interface name="memory" internal="hps.memory" />
  <interface
    name="pixel_buffer_controller_ext_interface"
@@ -953,7 +954,7 @@
   <parameter name="TRP" value="15.0" />
   <parameter name="TWR" value="14.0" />
   <parameter name="casLatency" value="3" />
-  <parameter name="clockRate" value="50000000" />
+  <parameter name="clockRate" value="166000000" />
   <parameter name="columnWidth" value="10" />
   <parameter name="componentName">$${FILENAME}_sdram_controller</parameter>
   <parameter name="dataWidth" value="16" />
@@ -973,9 +974,10 @@
  <module
    name="sdram_interface"
    kind="sdram_interface"
-   version="1.1"
+   version="1.2"
    enabled="1">
   <parameter name="ADDR_WIDTH" value="32" />
+  <parameter name="CLEAR_COLOR" value="4278190080" />
   <parameter name="COLOR_WIDTH" value="32" />
   <parameter name="COORD_WIDTH" value="16" />
   <parameter name="FIFO_DEPTH" value="32" />
@@ -1136,11 +1138,6 @@
    kind="clock"
    version="18.1"
    start="main_pll.sys_clk"
-   end="sdram_controller.clk" />
- <connection
-   kind="clock"
-   version="18.1"
-   start="main_pll.sys_clk"
    end="sdram_interface.clock" />
  <connection
    kind="clock"
@@ -1267,11 +1264,6 @@
    version="18.1"
    start="vga_pll.reset_source"
    end="vga_rgb_resampler.reset" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="main_pll.reset_source"
-   end="sdram_controller.reset" />
  <connection
    kind="reset"
    version="18.1"

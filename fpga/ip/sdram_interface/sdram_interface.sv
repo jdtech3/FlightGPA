@@ -16,13 +16,17 @@
         - Assumes 32-bit address width
         - 24-bit data width does NOT work due to Avalon adapter issues
 
+        - DOES NOT HAVE CACHING YET!
+
 */
 
 module sdram_interface #(
+    parameter CLEAR_COLOR = 32'hFF000000,
+
     // The following are all supposed to be private localparams,
     // but Quartus Lite does not support localparams in parameter initialization list :/
     parameter COLOR_WIDTH = 32,
-    parameter FIFO_DEPTH = 1,
+    parameter FIFO_DEPTH = 32,
     parameter ADDR_WIDTH = 32,
     parameter COORD_WIDTH = 16
 )
@@ -31,9 +35,12 @@ module sdram_interface #(
     input wire	reset,
 
     // Control
-    input wire start,
-    output wire done,
+    input wire                      start,
+    output wire                     done,
     input wire [ADDR_WIDTH-1:0]     base_addr_offset,   // which buffer to write to
+
+    // Special operations
+    input wire  clear,      // clear will write CLEAR_COLOR to entire screen
 
     // Bounds
     input wire [COORD_WIDTH-1:0]    x_start,
@@ -79,7 +86,9 @@ module sdram_interface #(
 
     typedef enum bit [15:0] {
         MODULE_IDLE,
-        MODULE_START,
+        MODULE_START_CLEAR,
+        MODULE_WRITING_CLEAR,
+        MODULE_START_DRAW,
         MODULE_PIXEL_START,
         MODULE_PIXEL_FETCHING,
         // MODULE_PIXEL_FETCH_DONE,
@@ -138,6 +147,8 @@ module sdram_interface #(
     logic writer_done;
     logic writer_write;
     logic writer_buffer_full;
+    logic [COLOR_WIDTH-1:0] writer_data;
+    logic [ADDR_WIDTH-1:0] writer_length;
     sdram_writer_state_t writer_current_state;
     sdram_writer_state_t writer_next_state;
 
@@ -145,17 +156,25 @@ module sdram_interface #(
 
     assign current_x = x_start + current_dx;
     assign current_y = y_start + current_dy;
-    assign base_address = base_addr_offset + ( (current_y * 640 + current_x) * 4 );
+    assign base_address = (module_current_state == MODULE_WRITING_CLEAR) ? base_addr_offset : ( base_addr_offset + ( (current_y * 640 + current_x) * 4 ) );
 
     always_comb begin
         case (module_current_state)
-            MODULE_IDLE:                module_next_state = start ? MODULE_START : MODULE_IDLE;
-            MODULE_START:               module_next_state = MODULE_PIXEL_START;
+            MODULE_IDLE:                module_next_state = ~start ? MODULE_IDLE : 
+                                                                     (clear ? MODULE_START_CLEAR : MODULE_START_DRAW);
+
+            // Clear
+            MODULE_START_CLEAR:         module_next_state = MODULE_WRITING_CLEAR;
+            MODULE_WRITING_CLEAR:       module_next_state = (writer_current_state == SDRAM_WRITER_DONE) ? MODULE_DONE : MODULE_WRITING_CLEAR;
+
+            // Draw
+            MODULE_START_DRAW:          module_next_state = MODULE_PIXEL_START;
             MODULE_PIXEL_START:         module_next_state = pixel_counter_done ? MODULE_DONE : MODULE_PIXEL_FETCHING;  // delay to ensure address is stable before we try to read
             MODULE_PIXEL_FETCHING:      module_next_state = (reader_current_state == SDRAM_READER_DONE) ? MODULE_PIXEL_WAIT : MODULE_PIXEL_FETCHING;
             MODULE_PIXEL_WAIT:          module_next_state = MODULE_PIXEL_FLUSHING;
             MODULE_PIXEL_FLUSHING:      module_next_state = (writer_current_state == SDRAM_WRITER_DONE) ? MODULE_PIXEL_DONE : MODULE_PIXEL_FLUSHING;
             MODULE_PIXEL_DONE:          module_next_state = MODULE_PIXEL_START;
+            
             MODULE_DONE:                module_next_state = MODULE_IDLE;
         endcase
     end
@@ -165,7 +184,7 @@ module sdram_interface #(
     end
     
     always_comb begin
-        pixel_counter_reset = module_current_state == MODULE_START;
+        pixel_counter_reset = module_current_state == MODULE_START_DRAW;
         pixel_counter_enable = module_current_state == MODULE_PIXEL_DONE;
         done = module_current_state == MODULE_DONE;
     end
@@ -198,7 +217,7 @@ module sdram_interface #(
 
     always_comb begin
         case (writer_current_state)
-            SDRAM_WRITER_IDLE:          writer_next_state = (module_current_state == MODULE_PIXEL_FLUSHING) ? SDRAM_WRITER_START : SDRAM_WRITER_IDLE;
+            SDRAM_WRITER_IDLE:          writer_next_state = (module_current_state == MODULE_PIXEL_FLUSHING | module_current_state == MODULE_START_CLEAR) ? SDRAM_WRITER_START : SDRAM_WRITER_IDLE;
             SDRAM_WRITER_START:         writer_next_state = SDRAM_WRITER_PRETRANSFER;
             SDRAM_WRITER_PRETRANSFER:   writer_next_state = SDRAM_WRITER_WRITING;
             SDRAM_WRITER_WRITING:       writer_next_state = SDRAM_WRITER_POST_WRITE;
@@ -217,6 +236,9 @@ module sdram_interface #(
         writer_go = writer_current_state == SDRAM_WRITER_START;
         writer_write = writer_current_state == SDRAM_WRITER_WRITING;
     end
+
+    assign writer_data = (writer_current_state == MODULE_WRITING_CLEAR) ? CLEAR_COLOR : new_color;     // feed new_color directly as drawing module is combinational anyway
+    assign writer_length = (writer_current_state == MODULE_WRITING_CLEAR) ? 'd307200*(COLOR_WIDTH/8) : COLOR_WIDTH/8;
     
     // --- Modules ---
 
@@ -269,11 +291,11 @@ module sdram_interface #(
         
         .control_fixed_location(1'b0),
         .control_write_base(base_address),
-        .control_write_length(COLOR_WIDTH/8),   // in bytes
+        .control_write_length(writer_length),   // in bytes
         .control_go(writer_go),
         .control_done(writer_done),
         
-        .user_buffer_data(new_color),           // feed writer input directly as drawing module is combinational anyway
+        .user_buffer_data(writer_data),
         .user_write_buffer(writer_write),
         .user_buffer_full(writer_buffer_full),
         
@@ -284,7 +306,7 @@ module sdram_interface #(
         .master_waitrequest(wm_waitrequest)
     );
 
-    assign wm_writedata = new_color;    // write_master FIFO bypass!!
+    assign wm_writedata = writer_data;    // write_master FIFO bypass!!
 
     // NOTE: write_master FIFO bypass is workaround for issue that somehow data coming out of the writer's Avalon data
     //       data line (master_writedata) don't correspond to our input data (user_write_buffer). Being 0x80 addresses off.

@@ -48,7 +48,7 @@ module sdram_draw_test(
     assign reset = ~KEY[0];
 
     pulse #(
-        .DURATION(100),
+        .DURATION(1000),
         .CLOCK_FREQUENCY(166000000))
     generate_pulse_1s(
         sys_clk,reset,pulse_1s
@@ -73,6 +73,7 @@ module sdram_draw_test(
 	reg [31:0] current_buffer_addr;
 	wire swap_buffer;
 
+	wire screen_clear;
 	wire screen_start;
 	wire [31:0] old_screen_colour; 
 	wire [31:0] new_screen_colour;
@@ -137,6 +138,8 @@ module sdram_draw_test(
 	end
 
 	assign swap_buffer = current_state == S_SWAP_BUFFER;
+	assign screen_clear = current_state == S_START_CLEAR;
+	// assign screen_clear = 1'b0;
 
 	assign LEDR[9] = (current_state == S_WAIT_CLEAR) | (current_state == S_WAIT_TRIANGLE);	// LED to gauge when SDRAM is being accessed by us
 
@@ -195,7 +198,7 @@ module sdram_draw_test(
         .vga_B                  (VGA_B),
 
 		// SDRAM interface signals
-		.sdram_interface_ext_interface_start			(screen_start),
+		.sdram_interface_ext_interface_start			(screen_start | (current_state == S_START_CLEAR)),
 		.sdram_interface_ext_interface_done    			(screen_done),
 		.sdram_interface_ext_interface_x_start  		(screen_x_min),
 		.sdram_interface_ext_interface_x_length 		(screen_x_range),
@@ -206,6 +209,7 @@ module sdram_draw_test(
 		.sdram_interface_ext_interface_old_color 		(old_screen_colour),
 		.sdram_interface_ext_interface_new_color 		(new_screen_colour),
 		.sdram_interface_ext_interface_base_addr_offset	(current_buffer_addr),
+		.sdram_interface_ext_interface_clear			(screen_clear),
 
 		// Pixel buffer controller signals
         .pixel_buffer_controller_ext_interface_swap_buffer(swap_buffer)
