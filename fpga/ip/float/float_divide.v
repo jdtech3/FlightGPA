@@ -229,7 +229,7 @@ module  float_divide_altfp_div_pst_p2f
 	`endif
 	);
 	defparam
-		altsyncram3.init_file = "float_divide.hex",
+		altsyncram3.init_file = "ip/float/float_divide.hex",
 		altsyncram3.operation_mode = "ROM",
 		altsyncram3.width_a = 9,
 		altsyncram3.widthad_a = 9,
