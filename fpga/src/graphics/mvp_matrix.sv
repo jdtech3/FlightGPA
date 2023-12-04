@@ -25,6 +25,7 @@ module mvp_matrix(
     reg [31:0] v [3:0][3:0];
 
     wire [5:0] count;
+    reg mult_vec;
     wire mat_mult_done;
     wire count_done;
     reg [7:0] current_state, next_state;
@@ -96,7 +97,7 @@ module mvp_matrix(
             current_state == S_MULT_ROTZYX_START ||
             current_state == S_MULT_PROJ_START ||
             current_state == S_TRANSFORM_START),
-        .mult_vec(1'b0),
+        .mult_vec(mult_vec),
         .m(m),
         .v(v),
         .o(o),
@@ -152,6 +153,7 @@ module mvp_matrix(
             39: sin_yaw <= sin_out;
         endcase
         case(current_state)
+            S_CALC_TRIG: mult_vec <= 1'b0;
             S_MULT_ROTYX_START: begin
                 m[0][0] <= cos_pitch;     m[0][1] <= 0;            m[0][2] <= sin_pitch; m[0][3] <= 0;
                 m[1][0] <= 0;             m[1][1] <= 32'h3f800000; m[1][2] <= 0;         m[1][3] <= 0;
@@ -179,7 +181,10 @@ module mvp_matrix(
 
                 v <= o;
             end
-            S_MULT_PROJ: if(mat_mult_done) m <= o;
+            S_MULT_PROJ: if(mat_mult_done) begin
+                m <= o;
+                mult_vec <= 1'b1;
+            end
             S_TRANSFORM_START: begin
                 v[0][0] <= x;
                 v[1][0] <= y;
@@ -189,8 +194,8 @@ module mvp_matrix(
             S_DIV_X: div_in <= o[0][0];
             S_DIV_Y: div_in <= o[1][0];
             S_DIV_Z: div_in <= o[2][0];
-            S_SAMP_X: ox <= int_out;
-            S_SAMP_Y: oy <= int_out;
+            S_SAMP_X: ox <= int_out + 32'd320;
+            S_SAMP_Y: oy <= int_out + 32'd240;
             S_SAMP_Z: oz <= int_out;
         endcase
     end

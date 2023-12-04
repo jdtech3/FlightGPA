@@ -5,12 +5,12 @@ module mvp_pipe(
     input wire [31:0] count,
     output wire done,
 
-    output reg [31:0] mem_read_addr,
-    input wire [31:0] mem_read_data,
+    output reg [31:0] mesh_addr,
+    input wire [31:0] mesh_data,
 
-    output reg [31:0] mem_write_addr,
-    output reg [31:0] mem_write_data,
-    output reg mem_wren
+    input wire [31:0] result_addr,
+    output wire [31:0] result_data
+
 );
 
     localparam
@@ -26,10 +26,9 @@ module mvp_pipe(
         S_WRITE_X = 9,
         S_WRITE_Y = 10,
         S_WRITE_Z = 11,
-        // S_WRITE_W = 12,
-        S_DELAY_UPDATE_MVP = 13,
-        S_DELAY_MVP_MULT = 14,
-        S_START_PIPE_DELAY = 15;
+        S_DELAY_UPDATE_MVP = 12,
+        S_DELAY_MVP_MULT = 13,
+        S_START_PIPE_DELAY = 14;
 
     reg [7:0] current_state, next_state;
     reg [31:0] mem_x, mem_y, mem_z;
@@ -39,7 +38,20 @@ module mvp_pipe(
     wire mvp_done;
     reg mvp_start;
 
+    reg [31:0] mem_write_addr;
+    reg [31:0] mem_write_data;
+    reg mem_wren;
+
     assign done = current_state == S_WAIT;
+
+    mvp_output mvp_output_inst(
+        .clock(clock),
+        .rdaddress(result_addr[6:0]),
+        .q(result_data),
+        .wraddress(mem_write_addr[6:0]),
+        .data(mem_write_data),
+        .wren(mem_wren)
+    );
 
     mvp_matrix mvp_mat_inst(
         .clock(clock),
@@ -94,22 +106,22 @@ module mvp_pipe(
                 mvp_start <= 1'b1;
             end
             S_START_PIPE: begin
-                mem_read_addr <= 0;
+                mesh_addr <= 0;
                 mem_write_addr <= -1;
                 in_count <= 0;
             end
             S_START_PIPE_DELAY:
-                mem_read_addr <= mem_read_addr+1;
+                mesh_addr <= mesh_addr+1;
             S_FETCH_X: begin
-                mem_x <= mem_read_data;
-                mem_read_addr <= mem_read_addr+1;
+                mem_x <= mesh_data;
+                mesh_addr <= mesh_addr+1;
             end
             S_FETCH_Y: begin
-                mem_y <= mem_read_data;
-                mem_read_addr <= mem_read_addr+1;
+                mem_y <= mesh_data;
+                mesh_addr <= mesh_addr+1;
             end
             S_FETCH_Z: begin
-                mem_z <= mem_read_data;
+                mem_z <= mesh_data;
             end
             S_START_MVP_MULT: begin
                 in_count <= in_count + 1;
@@ -130,11 +142,6 @@ module mvp_pipe(
                 mem_write_addr <= mem_write_addr+1;
                 mem_write_data <= mvp_oz; // mvp_out[2][0];
             end
-            // S_WRITE_W: begin
-            //     mem_wren <= 1'b1;
-            //     mem_write_addr <= mem_write_addr+1;
-            //     mem_write_data <= mvp_out[3][0];
-            // end
         endcase
 
     end
