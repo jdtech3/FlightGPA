@@ -52,9 +52,9 @@ force {z} 0
 run 3200ns
 
 force {start} 1, 0 10ns
-force {roll} 0
-force {pitch} 0
-force {yaw} 0
+force {roll} 32'h3f490fdb
+force {pitch} 32'h3f060a92
+force {yaw} 32'h3f860a92
 force {x} 0
 force {y} 0
 force {z} 0

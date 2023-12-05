@@ -33,10 +33,10 @@ module mvp_matrix(
     localparam
 		S_WAIT              = 8'd0,
         S_CALC_TRIG         = 8'd1,
-        S_MULT_ROTYX_START  = 8'd2,
-		S_MULT_ROTYX        = 8'd3,
-		S_MULT_ROTZYX_START = 8'd4,
-        S_MULT_ROTZYX       = 8'd5,
+        S_MULT_ROTZX_START  = 8'd2,
+		S_MULT_ROTZX        = 8'd3,
+		S_MULT_ROTZXY_START = 8'd4,
+        S_MULT_ROTZXY       = 8'd5,
         S_MULT_PROJ_START   = 8'd6,
         S_MULT_PROJ         = 8'd7,
         S_TRANSFORM_START   = 8'd8,
@@ -93,8 +93,8 @@ module mvp_matrix(
         .clock(clock),
         .reset(reset),
         .start(
-            current_state == S_MULT_ROTYX_START ||
-            current_state == S_MULT_ROTZYX_START ||
+            current_state == S_MULT_ROTZX_START ||
+            current_state == S_MULT_ROTZXY_START ||
             current_state == S_MULT_PROJ_START ||
             current_state == S_TRANSFORM_START),
         .mult_vec(mult_vec),
@@ -114,11 +114,11 @@ module mvp_matrix(
     always @(*) begin
 		case(current_state)
 			S_WAIT:              next_state <= start ? (update_mvp ? S_CALC_TRIG : S_TRANSFORM_START) : S_WAIT;
-			S_CALC_TRIG:         next_state <= count_done ? S_MULT_ROTYX_START : S_CALC_TRIG;
-            S_MULT_ROTYX_START:  next_state <= S_MULT_ROTYX;
-			S_MULT_ROTYX:        next_state <= mat_mult_done ? S_MULT_ROTZYX_START : S_MULT_ROTYX;
-            S_MULT_ROTZYX_START: next_state <= S_MULT_ROTZYX;
-            S_MULT_ROTZYX:       next_state <= mat_mult_done ? S_MULT_PROJ_START: S_MULT_ROTZYX;
+			S_CALC_TRIG:         next_state <= count_done ? S_MULT_ROTZX_START : S_CALC_TRIG;
+            S_MULT_ROTZX_START:  next_state <= S_MULT_ROTZX;
+			S_MULT_ROTZX:        next_state <= mat_mult_done ? S_MULT_ROTZXY_START : S_MULT_ROTZX;
+            S_MULT_ROTZXY_START: next_state <= S_MULT_ROTZXY;
+            S_MULT_ROTZXY:       next_state <= mat_mult_done ? S_MULT_PROJ_START: S_MULT_ROTZXY;
             S_MULT_PROJ_START:   next_state <= S_MULT_PROJ;
             S_MULT_PROJ:         next_state <= mat_mult_done ? S_WAIT : S_MULT_PROJ;
             S_TRANSFORM_START:   next_state <= S_TRANSFORM;
@@ -154,22 +154,22 @@ module mvp_matrix(
         endcase
         case(current_state)
             S_CALC_TRIG: mult_vec <= 1'b0;
-            S_MULT_ROTYX_START: begin
-                m[0][0] <= cos_pitch;     m[0][1] <= 0;            m[0][2] <= sin_pitch; m[0][3] <= 0;
-                m[1][0] <= 0;             m[1][1] <= 32'h3f800000; m[1][2] <= 0;         m[1][3] <= 0;
-                m[2][0] <= neg_sin_pitch; m[2][1] <= 0;            m[2][2] <= cos_pitch; m[2][3] <= 0;
-                m[3][0] <= 0;             m[3][1] <= 0;            m[3][2] <= 0;         m[3][3] <= 32'h3f800000;
+            S_MULT_ROTZX_START: begin
+                m[0][0] <= 32'h3f800000;  m[0][1] <= 0;         m[0][2] <= 0;             m[0][3] <= 0;
+                m[1][0] <= 0;             m[1][1] <= cos_pitch; m[1][2] <= neg_sin_pitch; m[1][3] <= 0;
+                m[2][0] <= 0;             m[2][1] <= sin_pitch; m[2][2] <= cos_pitch;     m[2][3] <= 0;
+                m[3][0] <= 0;             m[3][1] <= 0;         m[3][2] <= 0;             m[3][3] <= 32'h3f800000;
 
-                v[0][0] <= 32'h3f800000; v[0][1] <= 0;        v[0][2] <= 0;            v[0][3] <= 0;
-                v[1][0] <= 0;            v[1][1] <= cos_roll; v[1][2] <= neg_sin_roll; v[1][3] <= 0;
-                v[2][0] <= 0;            v[2][1] <= sin_roll; v[2][2] <= cos_roll;     v[2][3] <= 0;
-                v[3][0] <= 0;            v[3][1] <= 0;        v[3][2] <= 0;            v[3][3] <= 32'h3f800000;
+                v[0][0] <= cos_roll; v[0][1] <= neg_sin_roll; v[0][2] <= 0;            v[0][3] <= 0;
+                v[1][0] <= sin_roll; v[1][1] <= cos_roll;     v[1][2] <= 0;            v[1][3] <= 0;
+                v[2][0] <= 0;        v[2][1] <= 0;            v[2][2] <= 32'h3f800000; v[2][3] <= 0;
+                v[3][0] <= 0;        v[3][1] <= 0;            v[3][2] <= 0;            v[3][3] <= 32'h3f800000;
             end
-            S_MULT_ROTZYX_START: begin
-                m[0][0] <= cos_yaw; m[0][1] <= neg_sin_yaw; m[0][2] <= 0;            m[0][3] <= x;
-                m[1][0] <= sin_yaw; m[1][1] <= cos_yaw;     m[1][2] <= 0;            m[1][3] <= y;
-                m[2][0] <= 0;       m[2][1] <= 0;           m[2][2] <= 32'h3f800000; m[2][3] <= z;
-                m[3][0] <= 0;       m[3][1] <= 0;           m[3][2] <= 0;            m[3][3] <= 32'h3f800000;
+            S_MULT_ROTZXY_START: begin
+                m[0][0] <= cos_yaw; m[0][1] <= 0;            m[0][2] <= neg_sin_yaw; m[0][3] <= x;
+                m[1][0] <= 0;       m[1][1] <= 32'h3f800000; m[1][2] <= 0;           m[1][3] <= y;
+                m[2][0] <= sin_yaw; m[2][1] <= 0;            m[2][2] <= cos_yaw;     m[2][3] <= z;
+                m[3][0] <= 0;       m[3][1] <= 0;            m[3][2] <= 0;           m[3][3] <= 32'h3f800000;
 
                 v <= o;
             end
