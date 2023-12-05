@@ -37,6 +37,7 @@ module sdram_interface #(
     // Control
     input wire                      start,
     output wire                     done,
+    input wire                      stall,              // if high, stall memory access
     input wire [ADDR_WIDTH-1:0]     base_addr_offset,   // which buffer to write to
 
     // Special operations
@@ -102,6 +103,7 @@ module sdram_interface #(
     typedef enum bit [15:0] {
         SDRAM_WRITER_IDLE,
         SDRAM_WRITER_START,
+        SDRAM_WRITER_CHECK_STALL,
         SDRAM_WRITER_WRITING,
         SDRAM_WRITER_POST_WRITE,
         SDRAM_WRITER_DONE
@@ -196,7 +198,7 @@ module sdram_interface #(
         case (reader_current_state)
             SDRAM_READER_IDLE:          reader_next_state = (module_current_state == MODULE_PIXEL_FETCHING) ? SDRAM_READER_START : SDRAM_READER_IDLE;
             SDRAM_READER_START:         reader_next_state = SDRAM_READER_PRETRANSFER;
-            SDRAM_READER_PRETRANSFER:   reader_next_state = SDRAM_READER_PRE_READ;
+            SDRAM_READER_PRETRANSFER:   reader_next_state = ~stall ? SDRAM_READER_PRE_READ : SDRAM_READER_PRETRANSFER;
             SDRAM_READER_PRE_READ:      reader_next_state = reader_data_available ? SDRAM_READER_READING : SDRAM_READER_PRE_READ;   // also stuck here if no data to read
             SDRAM_READER_READING:       reader_next_state = reader_done ? SDRAM_READER_DONE : SDRAM_READER_PRE_READ;
             SDRAM_READER_DONE:          reader_next_state = SDRAM_READER_IDLE;
@@ -221,9 +223,11 @@ module sdram_interface #(
             // SDRAM_WRITER_IDLE:          writer_next_state = writer_start ? (writer_length == 1'b1 ? SDRAM_WRITER_WRITING : SDRAM_WRITER_START) : SDRAM_WRITER_IDLE;
             SDRAM_WRITER_IDLE:          writer_next_state = writer_start ? SDRAM_WRITER_START : SDRAM_WRITER_IDLE;
             SDRAM_WRITER_START:         writer_next_state = SDRAM_WRITER_WRITING;
+            // SDRAM_WRITER_CHECK_STALL:   writer_next_state = ~stall ? SDRAM_WRITER_WRITING : SDRAM_WRITER_CHECK_STALL;
             SDRAM_WRITER_WRITING:       writer_next_state = wm_waitrequest ? SDRAM_WRITER_WRITING : SDRAM_WRITER_POST_WRITE;
             // SDRAM_WRITER_POST_WRITE:    writer_next_state = (writer_length == 1'b1 | writer_word_number == writer_length-1) ? SDRAM_WRITER_DONE : SDRAM_WRITER_WRITING;
-            SDRAM_WRITER_POST_WRITE:    writer_next_state = (writer_word_number == writer_length-1) ? SDRAM_WRITER_DONE : SDRAM_WRITER_WRITING;
+            SDRAM_WRITER_POST_WRITE:    writer_next_state = (writer_word_number == writer_length-1) ? SDRAM_WRITER_DONE : 
+                                                                                                      (~stall ? SDRAM_WRITER_WRITING : SDRAM_WRITER_POST_WRITE);
             SDRAM_WRITER_DONE:          writer_next_state = SDRAM_WRITER_IDLE;
             default:                    writer_next_state = SDRAM_WRITER_IDLE;
         endcase

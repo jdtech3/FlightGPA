@@ -48,7 +48,7 @@ module sdram_draw_test(
     assign reset = ~KEY[0];
 
     pulse #(
-        .DURATION(100),
+        .DURATION(40),
         .CLOCK_FREQUENCY(166000000))
     generate_pulse_1s(
         sys_clk,reset,pulse_1s
@@ -68,7 +68,7 @@ module sdram_draw_test(
 	reg drawer_en;
 	reg [3:0] opcode;
 	reg [15:0] ax, ay, bx, by, cx, cy;
-	reg [31:0] colour;
+	reg [23:0] colour;
 
 	reg [31:0] current_buffer_addr;
 	wire swap_buffer;
@@ -94,7 +94,7 @@ module sdram_draw_test(
 		case(current_state)
 			S_WAIT: next_state = draw_en ? S_START_CLEAR : S_WAIT;
 			S_START_CLEAR: next_state = S_WAIT_CLEAR;
-			S_WAIT_CLEAR: next_state = drawer_done ? S_START_TRIANGLE : S_WAIT_CLEAR;
+			S_WAIT_CLEAR: next_state = screen_done ? S_START_TRIANGLE : S_WAIT_CLEAR;
 			// S_WAIT_BLANK: next_state = ~VGA_BLANK_N ? S_START_TRIANGLE : S_WAIT_BLANK;
 			S_START_TRIANGLE: next_state = S_WAIT_TRIANGLE;
 			S_WAIT_TRIANGLE: next_state = drawer_done ? S_SWAP_BUFFER : S_WAIT_TRIANGLE;
@@ -110,19 +110,19 @@ module sdram_draw_test(
 	always @(posedge sys_clk) begin
 		drawer_en <= 0;
 		if(reset) begin
-			ax <= 16'd100; ay <= 16'd100;
-			bx <= 16'd150; by <= 16'd100;
-			cx <= 16'd100; cy <= 16'd150;
+			ax <= 16'd0; ay <= 16'd0;
+			bx <= 16'd300; by <= 16'd100;
+			cx <= 16'd100; cy <= 16'd300;
 			colour <= 0;
 			current_buffer_addr <= 32'h0012C000;
 		end
 		else begin
 			case(current_state)
 				S_START_TRIANGLE: begin
-					ax <= ax == 639 ? 0 : ax+1;
-					bx <= bx == 639 ? 0 : bx+1;
-					cx <= cx == 639 ? 0 : cx+1;
-					colour <= 32'hFFFF0000;
+					// ax <= ax == 639 ? 0 : ax+1;
+					// bx <= bx == 639 ? 0 : bx+1;
+					// cx <= cx == 639 ? 0 : cx+1;
+					colour <= colour + 'd1000;
 					opcode <= 1;
 					drawer_en <= 1;
 				end
@@ -135,15 +135,16 @@ module sdram_draw_test(
 	assign screen_clear = current_state == S_START_CLEAR;
 
 	assign LEDR[9] = (current_state == S_WAIT_CLEAR) | (current_state == S_WAIT_TRIANGLE);	// LED to gauge when SDRAM is being accessed by us
+	assign LEDR[8] = VGA_BLANK_N;
 
-	draw #(16,32,640,480) draw_operation(
+	draw #(32,32,640,480) draw_operation(
 		.clock(sys_clk),
 		.reset(reset),
 		.opcode(opcode),
 		.ax(ax), .ay(ay),
 		.bx(bx), .by(by),
 		.cx(cx), .cy(cy),
-		.colour(colour),
+		.colour({32'hFF, colour}),
 		.draw_en(drawer_en),
 		.draw_done(drawer_done),
 
@@ -162,9 +163,9 @@ module sdram_draw_test(
     
         // Global signals
         .sys_ref_clk_clk        (CLOCK_50),
-        .sys_ref_reset_reset    (~KEY[0]),
+        .sys_ref_reset_reset    (reset),
         .vga_ref_clk_clk        (CLOCK2_50),
-        .vga_ref_reset_reset    (~KEY[1]),
+        .vga_ref_reset_reset    (reset),
 
 		.sys_clk_bridge_out_clk_clk (sys_clk),
          
@@ -203,6 +204,7 @@ module sdram_draw_test(
 		.sdram_interface_ext_interface_new_color 		(new_screen_colour),
 		.sdram_interface_ext_interface_base_addr_offset	(current_buffer_addr),
 		.sdram_interface_ext_interface_clear			(screen_clear),
+		.sdram_interface_ext_interface_stall			(VGA_BLANK_N | SW[9]),
 
 		// Pixel buffer controller signals
         .pixel_buffer_controller_ext_interface_swap_buffer(swap_buffer)
@@ -210,11 +212,11 @@ module sdram_draw_test(
 
 	// --- Hex decoders ---
 
-	hex_decoder hex5 ( .c(current_buffer_addr[23:20]), .display(HEX5) );
-	hex_decoder hex4 ( .c(current_buffer_addr[19:16]), .display(HEX4) );
-	hex_decoder hex3 ( .c(current_buffer_addr[15:12]), .display(HEX3) );
-	hex_decoder hex2 ( .c(current_buffer_addr[11:8]), .display(HEX2) );
-	hex_decoder hex1 ( .c(current_buffer_addr[7:4]), .display(HEX1) );
-	hex_decoder hex0 ( .c(current_buffer_addr[3:0]), .display(HEX0) );
+	hex_decoder hex5 ( .c(colour[23:20]), .display(HEX5) );
+	hex_decoder hex4 ( .c(colour[19:16]), .display(HEX4) );
+	hex_decoder hex3 ( .c(colour[15:12]), .display(HEX3) );
+	hex_decoder hex2 ( .c(colour[11:8]), .display(HEX2) );
+	hex_decoder hex1 ( .c(colour[7:4]), .display(HEX1) );
+	hex_decoder hex0 ( .c(colour[3:0]), .display(HEX0) );
 	
 endmodule
