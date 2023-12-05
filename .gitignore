@@ -20,6 +20,7 @@
 # ModelSim working files
 **/work/
 **/simulation/
+**/*.ver
 vsim.wlf
 
 # Temp files
