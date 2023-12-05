@@ -2,6 +2,8 @@ module mvp_matrix(
     input clock, reset, start, update_mvp,
     input [31:0] roll, pitch, yaw,
     input [31:0] x, y, z,
+    input [31:0] speed,
+    output reg [31:0] vx, vy, vz,
     output wire [31:0] o [3:0][3:0],
     output reg [31:0] ox, oy, oz,
     output wire done
@@ -30,6 +32,8 @@ module mvp_matrix(
     wire count_done;
     reg [7:0] current_state, next_state;
 
+    reg [31:0] float_to_int_in;
+
     localparam
 		S_WAIT              = 8'd0,
         S_CALC_TRIG         = 8'd1,
@@ -47,9 +51,17 @@ module mvp_matrix(
         S_WAIT_DIV          = 8'd13,
         S_SAMP_X            = 8'd14,
         S_SAMP_Y            = 8'd15,
-        S_SAMP_Z            = 8'd16;
+        S_SAMP_Z            = 8'd16,
+        S_FORWARD_START     = 8'd17,
+        S_FORWARD           = 8'd18,
+        S_FORWARD_TO_INT    = 8'd19,
+        S_MULT_TRANS_START  = 8'd20,
+        S_MULT_TRANS        = 8'd21;
 
-    assign count_done = (current_state == S_CALC_TRIG && count == 39) || (current_state == S_WAIT_DIV && count == 9);
+    assign count_done =
+        (current_state == S_CALC_TRIG && count == 39) ||
+        (current_state == S_WAIT_DIV && count == 9) ||
+        (current_state == S_FORWARD_TO_INT && count == 8);
     assign done = current_state == S_WAIT;
 
     assign neg_sin_roll = {~sin_roll[31], sin_roll[30:0]};
@@ -85,7 +97,7 @@ module mvp_matrix(
         .aclr(reset),
         .clk_en(1'b1),
         .clock(clock),
-        .dataa(div_out),
+        .dataa(current_state == S_MULT_PROJ_START || current_state == S_FORWARD_TO_INT ? float_to_int_in : div_out),
         .result(int_out)
     );
 
@@ -96,6 +108,8 @@ module mvp_matrix(
             current_state == S_MULT_ROTZX_START ||
             current_state == S_MULT_ROTZXY_START ||
             current_state == S_MULT_PROJ_START ||
+            current_state == S_FORWARD_START ||
+            current_state == S_MULT_TRANS_START ||
             current_state == S_TRANSFORM_START),
         .mult_vec(mult_vec),
         .m(m),
@@ -107,7 +121,7 @@ module mvp_matrix(
     counter #(6) counter_inst(
 		.clock(clock),
 		.reset(reset || count_done),
-		.enable(current_state == S_CALC_TRIG || current_state == S_WAIT_DIV),
+		.enable(current_state == S_CALC_TRIG || current_state == S_WAIT_DIV || current_state == S_FORWARD_TO_INT),
 		.out(count)
 	);
     
@@ -118,7 +132,12 @@ module mvp_matrix(
             S_MULT_ROTZX_START:  next_state <= S_MULT_ROTZX;
 			S_MULT_ROTZX:        next_state <= mat_mult_done ? S_MULT_ROTZXY_START : S_MULT_ROTZX;
             S_MULT_ROTZXY_START: next_state <= S_MULT_ROTZXY;
-            S_MULT_ROTZXY:       next_state <= mat_mult_done ? S_MULT_PROJ_START: S_MULT_ROTZXY;
+            S_MULT_ROTZXY:       next_state <= mat_mult_done ? S_FORWARD_START : S_MULT_ROTZXY;
+            S_FORWARD_START:     next_state <= S_FORWARD;
+            S_FORWARD:           next_state <= mat_mult_done ? S_MULT_TRANS_START : S_FORWARD; 
+            S_MULT_TRANS_START:  next_state <= S_FORWARD_TO_INT;
+            S_FORWARD_TO_INT:    next_state <= count_done ? S_MULT_TRANS : S_FORWARD_TO_INT;
+            S_MULT_TRANS:        next_state <= mat_mult_done ? S_MULT_PROJ_START : S_MULT_TRANS;
             S_MULT_PROJ_START:   next_state <= S_MULT_PROJ;
             S_MULT_PROJ:         next_state <= mat_mult_done ? S_WAIT : S_MULT_PROJ;
             S_TRANSFORM_START:   next_state <= S_TRANSFORM;
@@ -166,12 +185,38 @@ module mvp_matrix(
                 v[3][0] <= 0;        v[3][1] <= 0;            v[3][2] <= 0;            v[3][3] <= 32'h3f800000;
             end
             S_MULT_ROTZXY_START: begin
-                m[0][0] <= cos_yaw; m[0][1] <= 0;            m[0][2] <= neg_sin_yaw; m[0][3] <= x;
-                m[1][0] <= 0;       m[1][1] <= 32'h3f800000; m[1][2] <= 0;           m[1][3] <= y;
-                m[2][0] <= sin_yaw; m[2][1] <= 0;            m[2][2] <= cos_yaw;     m[2][3] <= z;
+                m[0][0] <= cos_yaw; m[0][1] <= 0;            m[0][2] <= neg_sin_yaw; m[0][3] <= 0;
+                m[1][0] <= 0;       m[1][1] <= 32'h3f800000; m[1][2] <= 0;           m[1][3] <= 0;
+                m[2][0] <= sin_yaw; m[2][1] <= 0;            m[2][2] <= cos_yaw;     m[2][3] <= 0;
                 m[3][0] <= 0;       m[3][1] <= 0;            m[3][2] <= 0;           m[3][3] <= 32'h3f800000;
 
                 v <= o;
+            end
+            S_FORWARD_START: begin
+                mult_vec <= 1'b1;
+                m <= o;
+                v[0][0] <= 0;
+                v[1][0] <= 0;
+                v[2][0] <= {~speed[31], speed[30:0]};
+                v[3][0] <= 32'h3f800000;
+            end
+            S_MULT_TRANS_START: begin
+                mult_vec <= 1'b0;
+                m[0][0] <= 32'h3f800000; m[0][1] <= 0;            m[0][2] <= 0;            m[0][3] <= x;
+                m[1][0] <= 0;            m[1][1] <= 32'h3f800000; m[1][2] <= 0;            m[1][3] <= y;
+                m[2][0] <= 0;            m[2][1] <= 0;            m[2][2] <= 32'h3f800000; m[2][3] <= z;
+                m[3][0] <= 0;            m[3][1] <= 0;            m[3][2] <= 0;            m[3][3] <= 32'h3f800000;
+                v <= m;
+                float_to_int_in <= o[0][0];
+            end
+            S_FORWARD_TO_INT: begin
+                case(count)
+                    0: float_to_int_in <= o[1][0];
+                    1: float_to_int_in <= o[2][0];
+                    6: vx <= int_out;
+                    7: vy <= int_out;
+                    8: vz <= int_out;
+                endcase
             end
             S_MULT_PROJ_START: begin
                 m[0][0] <= 32'h43ab60b4; m[0][1] <= 0;            m[0][2] <= 0;            m[0][3] <= 0;
