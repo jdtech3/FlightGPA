@@ -51,8 +51,11 @@ module FlightGPA (
 
     // External inputs
     wire signed [INPUT_WIDTH-1:0] pitch_change = 0;     // deg/sec
-    wire signed [INPUT_WIDTH-1:0] roll_change = 0;      // deg/sec
-    wire [INPUT_WIDTH:0] throttle = 'd50;               // 0-100%
+    wire signed [INPUT_WIDTH-1:0] roll_change = 'hFF;   // deg/sec
+    reg [INPUT_WIDTH-1:0] throttle = 'd50;              // 0-100%
+
+    wire throttle_up;
+    wire throttle_down;
 
     // Plane state module
     wire plane_state_update_enable = SW[0];
@@ -72,6 +75,13 @@ module FlightGPA (
     wire signed [DATA_WIDTH-1:0] plane_state_roll;
     wire [DATA_WIDTH-1:0] plane_state_heading;
     wire [2:0] plane_state_plane_status_bits;
+
+    // --- Throttle control ---
+
+    always @ (posedge sys_clk) begin
+        if (throttle_up & throttle < 'd100) throttle <= throttle + 'd1;
+        else if (throttle_down & throttle > 'd0) throttle <= throttle - 'd1;
+    end
 
     // --- Modules ---
 
@@ -111,6 +121,9 @@ module FlightGPA (
         .SW(SW),
         .HEX5(HEX5), .HEX4(HEX4), .HEX3(HEX3), .HEX2(HEX2), .HEX1(HEX1), .HEX0(HEX0)
     );
+
+    button_debouncer debounce0 ( .clk(sys_clk), .reset(sys_reset), .btn(~KEY[2]), .pulse(throttle_up) );
+    button_debouncer debounce1 ( .clk(sys_clk), .reset(sys_reset), .btn(~KEY[3]), .pulse(throttle_down) );
     
     // --- Instantiating the system ---
     
