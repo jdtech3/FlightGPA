@@ -38,21 +38,75 @@ module FlightGPA (
     output  [6:0]   HEX0
 );
 
+    // --- Localparams ---
+    
+    parameter COORD_WIDTH = 32;         // x, y, z
+    parameter ANGLE_WIDTH = 16;         // pitch, roll, heading
+
     // --- Signals ---
 
     wire sys_clk;
     wire sys_reset = ~KEY[0];
     wire vga_reset = ~KEY[0];
 
+    // External inputs
+    wire signed [ANGLE_WIDTH-1:0] pitch_change = 'd0;   // deg/sec
+    wire signed [ANGLE_WIDTH-1:0] roll_change = 'd0;    // deg/sec
+    wire [7:0] throttle = 'd100;                        // 0-100%
+
+    // Plane state module
+    wire plane_state_update_enable = SW[0];
+    wire plane_state_update_done;
+    wire plane_state_request_input;
+    wire plane_state_input_ready = 1'b1;
+    wire plane_state_request_velocities;
+    wire plane_state_velocities_ready = 1'b1;
+    wire signed [COORD_WIDTH-1:0] plane_state_v_x = 'd0;
+    wire signed [COORD_WIDTH-1:0] plane_state_v_y = -'d10;
+    wire signed [COORD_WIDTH-1:0] plane_state_v_z = 'd0;
+    wire signed [COORD_WIDTH-1:0] plane_state_x;
+    wire signed [COORD_WIDTH-1:0] plane_state_y;
+    wire signed [COORD_WIDTH-1:0] plane_state_z;
+    wire [COORD_WIDTH-1:0] plane_state_speed;
+    wire signed [ANGLE_WIDTH-1:0] plane_state_pitch;
+    wire signed [ANGLE_WIDTH-1:0] plane_state_roll;
+    wire [ANGLE_WIDTH-1:0] plane_state_heading;
+    wire [2:0] plane_state_plane_status_bits;
+
     // --- Modules ---
+
+    plane_state plane (
+        .clk(sys_clk), .reset(sys_reset),
+
+        .update_enable(plane_state_update_enable),
+        .update_done(plane_state_update_done),
+        .request_input(plane_state_request_input),        
+        .input_ready(plane_state_input_ready),
+        .request_velocities(plane_state_request_velocities),
+        .velocities_ready(plane_state_velocities_ready),
+        .pitch_change(pitch_change),
+        .roll_change(roll_change),
+        .throttle(throttle),
+        .v_x(plane_state_v_x),
+        .v_y(plane_state_v_y),
+        .v_z(plane_state_v_z),
+        .x(plane_state_x),
+        .y(plane_state_y),
+        .z(plane_state_z),
+        .speed(plane_state_speed),
+        .pitch(plane_state_pitch),
+        .roll(plane_state_roll),
+        .heading(plane_state_heading),
+        .plane_status_bits(plane_state_plane_status_bits)
+    );
 
     instrument_display instruments (
         .clk(sys_clk), .reset(sys_reset),
 
-        .throttle('d80),
-        .heading('d350),
-        .altitude('d8214),
-        .speed('d251),
+        .throttle(throttle),
+        .heading(plane_state_heading),
+        .altitude(plane_state_y),       // technically y is signed, but y < 0 should never happen anyway
+        .speed(plane_state_speed),
 
         .SW(SW),
         .HEX5(HEX5), .HEX4(HEX4), .HEX3(HEX3), .HEX2(HEX2), .HEX1(HEX1), .HEX0(HEX0)

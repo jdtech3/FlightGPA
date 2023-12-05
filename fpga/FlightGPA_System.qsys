@@ -193,6 +193,14 @@
          type = "String";
       }
    }
+   element FlightGPA_System
+   {
+      datum _originalDeviceFamily
+      {
+         value = "Cyclone V";
+         type = "String";
+      }
+   }
    element hps
    {
       datum _sortIndex
@@ -1267,22 +1275,22 @@
  <connection
    kind="reset"
    version="18.1"
+   start="vga_pll.reset_source"
+   end="vga_fifo.reset_stream_in" />
+ <connection
+   kind="reset"
+   version="18.1"
    start="main_pll.reset_source"
    end="vga_fifo.reset_stream_in" />
  <connection
    kind="reset"
    version="18.1"
-   start="vga_pll.reset_source"
-   end="vga_fifo.reset_stream_in" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="vga_pll.reset_source"
+   start="main_pll.reset_source"
    end="vga_fifo.reset_stream_out" />
  <connection
    kind="reset"
    version="18.1"
-   start="main_pll.reset_source"
+   start="vga_pll.reset_source"
    end="vga_fifo.reset_stream_out" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />

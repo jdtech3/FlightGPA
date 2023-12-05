@@ -49,6 +49,8 @@ module instrument_display #(
 
     logic [6:0]     hex3, hex2, hex1, hex0;
 
+    logic [7:0]     throttle_clamped;
+
     logic [7:0]     throttle_digits;
     logic [15:0]    multi_display_value;
     logic [15:0]    multi_display_digits;
@@ -58,6 +60,7 @@ module instrument_display #(
 
     always_comb begin
         speed_kmh = {speed, 8'h00} * 24'h00039A;    // 0003.9A is 3.6 in 16.8 bit fixed point
+        throttle_clamped = (throttle > 'd99) ? 'd99 : throttle;
 
         case (SW[9:7])
             3'b001: multi_display_value = heading;
