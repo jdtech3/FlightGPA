@@ -59,6 +59,7 @@ module draw_triangle_pipe(
     assign opcode = 3'b1;
     assign mem_col_addr = in_count;
     assign draw_en = current_state == S_START_DRAW;
+    assign done = current_state == S_WAIT;
 
     always @(*) begin
         case(current_state)

@@ -38,9 +38,6 @@ module draw_mesh_test(
     wire [2:0] old_screen_colour;
     wire screen_done;
 
-    wire GND;
-
-    assign GND = 1'b0;
     assign clock = CLOCK_50;
     assign reset = ~KEY[0];
     assign start = ~KEY[1];
@@ -81,9 +78,9 @@ module draw_mesh_test(
         .done(draw_tri_pipe_done),
         .mem_read_addr(mvp_pipe_res_addr),
         .mem_read_data(mvp_pipe_res_data),
-        .mem_col_addr(GND),
+        .mem_col_addr(),
         .mem_col_data(3'b111),
-        .opcode(GND),
+        .opcode(),
         .ax(ax), .ay(ay), .az(az),
         .bx(bx), .by(by), .bz(bz),
         .cx(cx), .cy(cy), .cz(cz),
@@ -95,7 +92,7 @@ module draw_mesh_test(
         .clock(clock),
         .reset(reset),
         .start(start),
-        .done(GND),
+        .done(),
         .mvp_pipe_start(mvp_pipe_start),
         .mvp_pipe_update_mvp(mvp_pipe_update_mvp),
         .mvp_pipe_done(mvp_pipe_done),

@@ -24,7 +24,7 @@ module pipe_mesh_controller(
         S_START_MVP_PIPE    = 8'd3,
         S_WAIT_MVP_PIPE     = 8'd4,
         S_START_DRAW_PIPE   = 8'd5,
-        S_WAIT_DRAW_PIPE    = 8'd5;
+        S_WAIT_DRAW_PIPE    = 8'd6;
 
     reg [7:0] current_state, next_state;
 
