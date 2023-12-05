@@ -238,7 +238,7 @@ module sdram_interface #(
         writer_current_state <= reset ? SDRAM_WRITER_IDLE : writer_next_state;
         
         if (writer_current_state == SDRAM_WRITER_START) writer_word_number <= 'd0;
-        else if (writer_current_state == SDRAM_WRITER_POST_WRITE) writer_word_number <= writer_word_number + 'd1;
+        else if (writer_current_state == SDRAM_WRITER_POST_WRITE) writer_word_number <= writer_word_number + (stall ? 'd0 : 'd1);
     end
     
     always_comb begin

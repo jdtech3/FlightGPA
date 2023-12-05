@@ -48,7 +48,7 @@ module sdram_draw_test(
     assign reset = ~KEY[0];
 
     pulse #(
-        .DURATION(40),
+        .DURATION(50),
         .CLOCK_FREQUENCY(166000000))
     generate_pulse_1s(
         sys_clk,reset,pulse_1s
@@ -119,9 +119,9 @@ module sdram_draw_test(
 		else begin
 			case(current_state)
 				S_START_TRIANGLE: begin
-					// ax <= ax == 639 ? 0 : ax+1;
-					// bx <= bx == 639 ? 0 : bx+1;
-					// cx <= cx == 639 ? 0 : cx+1;
+					ax <= ax == 639 ? 0 : ax+1;
+					bx <= bx == 639 ? 0 : bx+1;
+					cx <= cx == 639 ? 0 : cx+1;
 					colour <= colour + 'd1000;
 					opcode <= 1;
 					drawer_en <= 1;
