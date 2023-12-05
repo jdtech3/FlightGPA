@@ -30,4 +30,5 @@ vsim.wlf
 hps/kernel/
 hps/toolchain/
 hps/spl_bsp/generated/
+hps/spl_bsp/uboot-socfpga/
 hps/rootfs/
