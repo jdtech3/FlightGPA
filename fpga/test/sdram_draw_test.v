@@ -31,7 +31,13 @@ module sdram_draw_test(
     // I/O
     input   [3:0]   KEY,
     input   [9:0]   SW,
-    output  [9:0]   LEDR
+    output  [9:0]   LEDR,
+	output 	[6:0]	HEX0,
+	output 	[6:0]	HEX1,
+	output 	[6:0]	HEX2,
+	output 	[6:0]	HEX3,
+	output 	[6:0]	HEX4,
+	output 	[6:0]	HEX5
 );
 
 	wire sys_clk;
@@ -39,11 +45,11 @@ module sdram_draw_test(
     wire reset;
     wire pulse_1s;
 
-    assign reset = ~KEY[2];
+    assign reset = ~KEY[0];
 
     pulse #(
-        .DURATION(1000),
-        .CLOCK_FREQUENCY(143000000))
+        .DURATION(40),
+        .CLOCK_FREQUENCY(166000000))
     generate_pulse_1s(
         sys_clk,reset,pulse_1s
     );
@@ -62,8 +68,12 @@ module sdram_draw_test(
 	reg drawer_en;
 	reg [3:0] opcode;
 	reg [15:0] ax, ay, bx, by, cx, cy;
-	reg [31:0] colour;
+	reg [23:0] colour;
 
+	reg [31:0] current_buffer_addr;
+	wire swap_buffer;
+
+	wire screen_clear;
 	wire screen_start;
 	wire [31:0] old_screen_colour; 
 	wire [31:0] new_screen_colour;
@@ -77,15 +87,18 @@ module sdram_draw_test(
 		S_START_CLEAR = 1,
 		S_WAIT_CLEAR = 2,
 		S_START_TRIANGLE = 3,
-		S_WAIT_TRIANGLE = 4;
+		S_WAIT_TRIANGLE = 4,
+		S_SWAP_BUFFER = 5;
 
 	always @(*) begin
 		case(current_state)
 			S_WAIT: next_state = draw_en ? S_START_CLEAR : S_WAIT;
 			S_START_CLEAR: next_state = S_WAIT_CLEAR;
-			S_WAIT_CLEAR: next_state = drawer_done ? S_START_TRIANGLE : S_WAIT_CLEAR;
+			S_WAIT_CLEAR: next_state = screen_done ? S_START_TRIANGLE : S_WAIT_CLEAR;
+			// S_WAIT_BLANK: next_state = ~VGA_BLANK_N ? S_START_TRIANGLE : S_WAIT_BLANK;
 			S_START_TRIANGLE: next_state = S_WAIT_TRIANGLE;
-			S_WAIT_TRIANGLE: next_state = drawer_done ? S_WAIT : S_WAIT_TRIANGLE;
+			S_WAIT_TRIANGLE: next_state = drawer_done ? S_SWAP_BUFFER : S_WAIT_TRIANGLE;
+			S_SWAP_BUFFER: next_state = S_WAIT;
 		endcase
 	end
 
@@ -97,38 +110,41 @@ module sdram_draw_test(
 	always @(posedge sys_clk) begin
 		drawer_en <= 0;
 		if(reset) begin
-			ax <= 16'd160; ay <= 16'd10;
-			bx <= 16'd100; by <= 16'd220;
-			cx <= 16'd220; cy <= 16'd200;
+			ax <= 16'd0; ay <= 16'd0;
+			bx <= 16'd300; by <= 16'd100;
+			cx <= 16'd100; cy <= 16'd300;
 			colour <= 0;
+			current_buffer_addr <= 32'h0012C000;
 		end
 		else begin
 			case(current_state)
-				S_START_CLEAR: begin
-					opcode <= 0;
-					colour <= 0;
-					drawer_en <= 1;
-				end
 				S_START_TRIANGLE: begin
-					ax <= ax == 319 ? 0 : ax+1;
-					bx <= bx == 319 ? 0 : bx+1;
-					cx <= cx == 319 ? 0 : cx+1;
-					colour <= 32'hFFFF0000;
+					// ax <= ax == 639 ? 0 : ax+1;
+					// bx <= bx == 639 ? 0 : bx+1;
+					// cx <= cx == 639 ? 0 : cx+1;
+					colour <= colour + 'd1000;
 					opcode <= 1;
 					drawer_en <= 1;
 				end
+				S_SWAP_BUFFER: current_buffer_addr <= (current_buffer_addr == 32'h00000000) ? 32'h0012C000 : 32'h00000000;
 			endcase
 		end
 	end
 
-	draw #(16,32,640,480) draw_operation(
+	assign swap_buffer = current_state == S_SWAP_BUFFER;
+	assign screen_clear = current_state == S_START_CLEAR;
+
+	assign LEDR[9] = (current_state == S_WAIT_CLEAR) | (current_state == S_WAIT_TRIANGLE);	// LED to gauge when SDRAM is being accessed by us
+	assign LEDR[8] = VGA_BLANK_N;
+
+	draw #(32,32,640,480) draw_operation(
 		.clock(sys_clk),
 		.reset(reset),
 		.opcode(opcode),
 		.ax(ax), .ay(ay),
 		.bx(bx), .by(by),
 		.cx(cx), .cy(cy),
-		.colour(colour),
+		.colour({32'hFF, colour}),
 		.draw_en(drawer_en),
 		.draw_done(drawer_done),
 
@@ -147,9 +163,9 @@ module sdram_draw_test(
     
         // Global signals
         .sys_ref_clk_clk        (CLOCK_50),
-        .sys_ref_reset_reset    (~KEY[0]),
+        .sys_ref_reset_reset    (reset),
         .vga_ref_clk_clk        (CLOCK2_50),
-        .vga_ref_reset_reset    (~KEY[1]),
+        .vga_ref_reset_reset    (reset),
 
 		.sys_clk_bridge_out_clk_clk (sys_clk),
          
@@ -176,16 +192,31 @@ module sdram_draw_test(
         .vga_B                  (VGA_B),
 
 		// SDRAM interface signals
-		.sdram_interface_ext_interface_start		(screen_start),
-		.sdram_interface_ext_interface_done    		(screen_done),
-		.sdram_interface_ext_interface_x_start  	(screen_x_min),
-		.sdram_interface_ext_interface_x_length 	(screen_x_range),
-		.sdram_interface_ext_interface_y_start   	(screen_y_min),
-		.sdram_interface_ext_interface_y_length  	(screen_y_range),
-		.sdram_interface_ext_interface_current_x 	(screen_x),
-		.sdram_interface_ext_interface_current_y 	(screen_y),
-		.sdram_interface_ext_interface_old_color 	(old_screen_colour),
-		.sdram_interface_ext_interface_new_color 	(new_screen_colour)
+		.sdram_interface_ext_interface_start			(screen_start | (current_state == S_START_CLEAR)),
+		.sdram_interface_ext_interface_done    			(screen_done),
+		.sdram_interface_ext_interface_x_start  		(screen_x_min),
+		.sdram_interface_ext_interface_x_length 		(screen_x_range),
+		.sdram_interface_ext_interface_y_start   		(screen_y_min),
+		.sdram_interface_ext_interface_y_length  		(screen_y_range),
+		.sdram_interface_ext_interface_current_x 		(screen_x),
+		.sdram_interface_ext_interface_current_y 		(screen_y),
+		.sdram_interface_ext_interface_old_color 		(old_screen_colour),
+		.sdram_interface_ext_interface_new_color 		(new_screen_colour),
+		.sdram_interface_ext_interface_base_addr_offset	(current_buffer_addr),
+		.sdram_interface_ext_interface_clear			(screen_clear),
+		.sdram_interface_ext_interface_stall			(VGA_BLANK_N | SW[9]),
+
+		// Pixel buffer controller signals
+        .pixel_buffer_controller_ext_interface_swap_buffer(swap_buffer)
 	);
+
+	// --- Hex decoders ---
+
+	hex_decoder hex5 ( .c(colour[23:20]), .display(HEX5) );
+	hex_decoder hex4 ( .c(colour[19:16]), .display(HEX4) );
+	hex_decoder hex3 ( .c(colour[15:12]), .display(HEX3) );
+	hex_decoder hex2 ( .c(colour[11:8]), .display(HEX2) );
+	hex_decoder hex1 ( .c(colour[7:4]), .display(HEX1) );
+	hex_decoder hex0 ( .c(colour[3:0]), .display(HEX0) );
 	
 endmodule
