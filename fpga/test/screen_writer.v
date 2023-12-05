@@ -80,7 +80,7 @@ module screen_writer(
 	defparam vga.RESOLUTION = "320x240";
 	defparam vga.MONOCHROME = "FALSE";
 	defparam vga.BITS_PER_COLOUR_CHANNEL = 1;
-	defparam vga.BACKGROUND_IMAGE = "vga_adapter/black.mif";
+	defparam vga.BACKGROUND_IMAGE = "src/vga_adapter/black.mif";
 
 	always @(*) begin
 		case(current_state)

@@ -175,6 +175,7 @@ module sdram_interface #(
             MODULE_PIXEL_DONE:          module_next_state = MODULE_PIXEL_START;
             
             MODULE_DONE:                module_next_state = MODULE_IDLE;
+            default:                    module_next_state = MODULE_IDLE;
         endcase
     end
 
