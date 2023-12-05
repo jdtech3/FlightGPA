@@ -46,6 +46,7 @@ module mvp_pipe(
 
     mvp_output mvp_output_inst(
         .clock(clock),
+        .aclr(reset),
         .rdaddress(result_addr[6:0]),
         .q(result_data),
         .wraddress(mem_write_addr[6:0]),

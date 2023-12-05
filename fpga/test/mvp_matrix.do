@@ -45,9 +45,9 @@ force {update_mvp} 0
 
 # x: -100
 # y: 100
-# z: -500
+# z: -100
 force {start} 1, 0 10ns
 force {x} 32'hC2C80000
 force {y} 32'h42C80000
-force {z} 32'hc3fa0000
+force {z} 32'hc2c80000
 run 1500ns
