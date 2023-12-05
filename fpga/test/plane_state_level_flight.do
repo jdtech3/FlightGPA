@@ -42,13 +42,12 @@ force {update_enable} 1
 force {input_ready} 1
 force {velocities_ready} 1
 
-force {pitch_change} 'd0
-force {roll_change} 'd0
+force {pitch_change} 'hFF
+force {roll_change} 'hFF
 force {throttle} 'd50
-force {v_x} 'd0
-force {v_y} 'd0
-#force {v_z} {'h14}
-force {v_z} {'hFFFFFFEC}
+force {v_x} 'h00010000
+force {v_y} 'hFFFF0000
+force {v_z} 'hFFEC0000
 # v_z = -20
 
 run 2000ms

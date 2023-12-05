@@ -40,8 +40,8 @@ module FlightGPA (
 
     // --- Localparams ---
     
-    parameter COORD_WIDTH = 32;         // x, y, z
-    parameter ANGLE_WIDTH = 16;         // pitch, roll, heading
+    localparam DATA_WIDTH = 32;  // Q16.16 fixed point
+    localparam INPUT_WIDTH = 8;
 
     // --- Signals ---
 
@@ -50,9 +50,9 @@ module FlightGPA (
     wire vga_reset = ~KEY[0];
 
     // External inputs
-    wire signed [ANGLE_WIDTH-1:0] pitch_change = 'd0;   // deg/sec
-    wire signed [ANGLE_WIDTH-1:0] roll_change = 'd0;    // deg/sec
-    wire [7:0] throttle = 'd100;                        // 0-100%
+    wire signed [INPUT_WIDTH-1:0] pitch_change = 0;     // deg/sec
+    wire signed [INPUT_WIDTH-1:0] roll_change = 0;      // deg/sec
+    wire [INPUT_WIDTH:0] throttle = 'd50;               // 0-100%
 
     // Plane state module
     wire plane_state_update_enable = SW[0];
@@ -61,16 +61,16 @@ module FlightGPA (
     wire plane_state_input_ready = 1'b1;
     wire plane_state_request_velocities;
     wire plane_state_velocities_ready = 1'b1;
-    wire signed [COORD_WIDTH-1:0] plane_state_v_x = 'd0;
-    wire signed [COORD_WIDTH-1:0] plane_state_v_y = -'d10;
-    wire signed [COORD_WIDTH-1:0] plane_state_v_z = 'd0;
-    wire signed [COORD_WIDTH-1:0] plane_state_x;
-    wire signed [COORD_WIDTH-1:0] plane_state_y;
-    wire signed [COORD_WIDTH-1:0] plane_state_z;
-    wire [COORD_WIDTH-1:0] plane_state_speed;
-    wire signed [ANGLE_WIDTH-1:0] plane_state_pitch;
-    wire signed [ANGLE_WIDTH-1:0] plane_state_roll;
-    wire [ANGLE_WIDTH-1:0] plane_state_heading;
+    wire signed [DATA_WIDTH-1:0] plane_state_v_x = 'h00010000;
+    wire signed [DATA_WIDTH-1:0] plane_state_v_y = 'hFFFF0000;
+    wire signed [DATA_WIDTH-1:0] plane_state_v_z = 'hFFEC0000;
+    wire signed [DATA_WIDTH-1:0] plane_state_x;
+    wire signed [DATA_WIDTH-1:0] plane_state_y;
+    wire signed [DATA_WIDTH-1:0] plane_state_z;
+    wire [DATA_WIDTH-1:0] plane_state_speed;
+    wire signed [DATA_WIDTH-1:0] plane_state_pitch;
+    wire signed [DATA_WIDTH-1:0] plane_state_roll;
+    wire [DATA_WIDTH-1:0] plane_state_heading;
     wire [2:0] plane_state_plane_status_bits;
 
     // --- Modules ---
@@ -104,9 +104,9 @@ module FlightGPA (
         .clk(sys_clk), .reset(sys_reset),
 
         .throttle(throttle),
-        .heading(plane_state_heading),
-        .altitude(plane_state_y),       // technically y is signed, but y < 0 should never happen anyway
-        .speed(plane_state_speed),
+        .heading(plane_state_heading[31:16]),
+        .altitude(plane_state_y[31:16]),        // technically y is signed, but y < 0 should never happen anyway
+        .speed(plane_state_speed[31:16]),
 
         .SW(SW),
         .HEX5(HEX5), .HEX4(HEX4), .HEX3(HEX3), .HEX2(HEX2), .HEX1(HEX1), .HEX0(HEX0)

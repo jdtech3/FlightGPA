@@ -9,35 +9,40 @@
     Notes:
         - Relies on external module to convert speed, pitch, roll, heading into X, Y, Z velocities
           (and expects these to be already registered)
-        - Most things are signed int, and only uses fixed point when strictly necessary, so not very precise
-        - Signed int overflow is NOT yet accounted for
+        - EVERYTHING is Q16.16 fixed point (if possible)
+        - Signed overflow is NOT yet accounted for
 
 */
 
 module plane_state #(
     parameter UPDATE_MS = 100,              // uint miliseconds interval between update
-    parameter UPDATE_S = 32'h0000199A,      // u fixed-p seconds interval between update (must be same as above!)
+    parameter UPDATE_S = 32'h0000_199A,     // u fixed-p seconds interval between update (must be same as above!)
+                                            // 0000_199A = 0.1
     parameter CLOCK_FREQUENCY = 166000000,
 
-    parameter INITIAL_X = 0,
-    parameter INITIAL_Y = 100,
-    parameter INITIAL_Z = 0,
-    parameter INITIAL_SPEED = 50,
-    parameter INITIAL_PITCH = 0,
-    parameter INITIAL_ROLL = 0,
-    parameter INITIAL_HEADING = 0,
+    parameter INITIAL_X = 32'sh0000_0000,
+    parameter INITIAL_Y = 32'sh0064_0000,       // 0064_0000 = 100
+    parameter INITIAL_Z = 32'sh0000_0000,
+    parameter INITIAL_SPEED = 32'h0014_0000,    // 0014_0000 = 20
+    parameter INITIAL_PITCH = 32'sh0000_0000,
+    parameter INITIAL_ROLL = 32'sh0000_0000,
+    parameter INITIAL_HEADING = 32'h0000_0000,
 
-    parameter STALL_SPEED = 15,             // [uint] if v < stall speed, pitch = -90 deg, v += 10/sec
-    parameter DRAG_COEF = 1,                // [uint] drag = C_d * v^2
-    parameter THRUST_COEF = 100,            // [uint] thrust = C_t * throttle%
-    parameter MASS_INV = 32'h0000028F,      // [u fixed-p] reciprocal of mass for a = F/m calculation
-    parameter ROLL_TO_HEADING_CHANGE = 1,   // heading_change = C_rthc * roll;
+    parameter STALL_SPEED = 32'h0005_0000,              // [u fixed-p] if v < stall speed, pitch = -90 deg, v += 10/sec
+                                                        // 0005_0000 = 5
+    parameter DRAG_COEF = 32'sh0005_0000,               // [u fixed-p] drag = C_d * v^2
+                                                        // 0005_0000 = 5
+    parameter THRUST_COEF = 32'sh0064_0000,             // [u fixed-p] thrust = C_t * throttle%
+                                                        // 0064_0000 = 100
+    parameter MASS_INV = 32'sh0000_028F,                // [u fixed-p] reciprocal of mass for a = F/m calculation
+                                                        // 0000_028F = 0.01
+    parameter ROLL_TO_HEADING_CHANGE = 32'sh0001_0000,  // heading_change = C_rthc * roll;
+                                                        // 0001_0000 = 1
 
     // The following are all supposed to be private localparams,
     // but Quartus Lite does not support localparams in parameter initialization list :/
-    parameter COORD_WIDTH = 32,         // x, y, z  (16 bit effective!! due to fixed point width)
-    parameter ANGLE_WIDTH = 16,         // pitch, roll, heading
-    parameter FIXED_POINT_WIDTH = 48    // fixed point are all 16.16 (16 bit) format
+    parameter DATA_WIDTH = 32,        // 16 bit effective!! due to fixed point
+    parameter INPUT_WIDTH = 8
 )
 (
     input clk,
@@ -52,22 +57,22 @@ module plane_state #(
     input velocities_ready,
 
     // Plane model input
-    input signed [ANGLE_WIDTH-1:0]  pitch_change,       // deg/sec
-    input signed [ANGLE_WIDTH-1:0]  roll_change,        // deg/sec
-    input [7:0]                     throttle,           // 0-100%
+    input signed [INPUT_WIDTH-1:0]  pitch_change,       // deg/sec
+    input signed [INPUT_WIDTH-1:0]  roll_change,        // deg/sec
+    input [INPUT_WIDTH-1:0]         throttle,           // 0-100%
 
-    input signed [COORD_WIDTH-1:0]  v_x,    // from speed -> xyz velocity converter
-    input signed [COORD_WIDTH-1:0]  v_y,
-    input signed [COORD_WIDTH-1:0]  v_z,
+    input signed [DATA_WIDTH-1:0]   v_x,    // from speed -> xyz velocity converter
+    input signed [DATA_WIDTH-1:0]   v_y,
+    input signed [DATA_WIDTH-1:0]   v_z,
 
     // Plane model state/output
-    output logic signed [COORD_WIDTH-1:0]   x,          // right
-    output logic signed [COORD_WIDTH-1:0]   y,          // up
-    output logic signed [COORD_WIDTH-1:0]   z,          // into screen
-    output logic [COORD_WIDTH-1:0]          speed,      // scalar, per sec
-    output logic signed [ANGLE_WIDTH-1:0]   pitch,      // deg from -z CCW as viewed from +x
-    output logic signed [ANGLE_WIDTH-1:0]   roll,       // deg from +y CCW as viewed from +z
-    output logic [ANGLE_WIDTH-1:0]          heading,    // deg from -z CW as viewed from +y
+    output logic signed [DATA_WIDTH-1:0]    x,          // right
+    output logic signed [DATA_WIDTH-1:0]    y,          // up
+    output logic signed [DATA_WIDTH-1:0]    z,          // into screen
+    output logic [DATA_WIDTH-1:0]           speed,      // scalar, per sec
+    output logic signed [DATA_WIDTH-1:0]    pitch,      // deg from -z CCW as viewed from +x
+    output logic signed [DATA_WIDTH-1:0]    roll,       // deg from +y CCW as viewed from +z
+    output logic [DATA_WIDTH-1:0]           heading,    // deg from -z CW as viewed from +y
                                                         // (0,0,0) angle is plane upright, flying towards -z
     output logic [2:0] plane_status_bits    // bitfield: {CRASHED, LANDED, FLYING}, all 0/multiple 1 is illegal
 );
@@ -105,30 +110,27 @@ module plane_state #(
     // Control
     logic update;
 
+    // Intermediates
+    // NOTE/TODO: Currently assumes all parameters are positive for simplicity!
+
     // Heading change
-    wire signed [ANGLE_WIDTH-1:0]  heading_change = ROLL_TO_HEADING_CHANGE * roll;     // deg/sec
+    wire signed [DATA_WIDTH*2-1:0] heading_change_raw = ROLL_TO_HEADING_CHANGE * {{32{roll[31]}}, roll};   // Q32.32 deg/sec
 
     // Scaled acceleration taking into account update rate and mass
-    wire signed [COORD_WIDTH-1:0]  force_raw = (THRUST_COEF * throttle) - (DRAG_COEF * speed * speed);  // may truncate
-    wire signed [FIXED_POINT_WIDTH*2-1:0] accel_raw = {force_raw, 16'h0000} * MASS_INV;
-    wire signed [FIXED_POINT_WIDTH*2-1:0] accel_scaled_raw = {accel_raw[95], accel_raw[62:32]} * UPDATE_S;
-    wire signed [COORD_WIDTH-1:0] accel_scaled = {accel_scaled_raw[95], accel_scaled_raw[62:32]};
+    wire signed [DATA_WIDTH*2-1:0] speed_squared_raw = {{32{speed[31]}}, speed} * {{32{speed[31]}}, speed};
+    wire signed [DATA_WIDTH*2-1:0] force_raw = (THRUST_COEF * {throttle, 16'h0000}) - (DRAG_COEF * {{32{speed_squared_raw[47]}}, speed_squared_raw[47:16]});
+    wire signed [DATA_WIDTH*2-1:0] accel_raw = {{32{force_raw[47]}}, force_raw[47:16]} * MASS_INV;
+    wire signed [DATA_WIDTH*2-1:0] accel_scaled_raw = {{32{accel_raw[47]}}, accel_raw[47:16]} * UPDATE_S;  // Q32.32 m/s^2
 
     // Scaled angle change rate taking into account update rate
-    wire signed [FIXED_POINT_WIDTH*2-1:0] pitch_change_scaled_raw =   {pitch_change, 16'h0000} * UPDATE_S;
-    wire signed [FIXED_POINT_WIDTH*2-1:0] roll_change_scaled_raw =    {roll_change, 16'h0000} * UPDATE_S;
-    wire signed [FIXED_POINT_WIDTH*2-1:0] heading_change_scaled_raw = {heading_change, 16'h0000} * UPDATE_S;
-    wire signed [ANGLE_WIDTH-1:0] pitch_change_scaled =    {pitch_change_scaled_raw[95], pitch_change_scaled_raw[46:32]};      // drop fractional and most significant parts
-    wire signed [ANGLE_WIDTH-1:0] roll_change_scaled =     {roll_change_scaled_raw[95], roll_change_scaled_raw[46:32]};        // TODO: round instead of trucate
-    wire signed [ANGLE_WIDTH-1:0] heading_change_scaled =  {heading_change_scaled_raw[95], heading_change_scaled_raw[46:32]};
+    wire signed [DATA_WIDTH*2-1:0] pitch_change_scaled_raw =   {{40{pitch_change[7]}}, pitch_change, 16'h0000} * UPDATE_S;
+    wire signed [DATA_WIDTH*2-1:0] roll_change_scaled_raw =    {{40{roll_change[7]}}, roll_change, 16'h0000} * UPDATE_S;
+    wire [DATA_WIDTH*2-1:0] heading_change_scaled_raw = {{32{heading_change_raw[47]}}, heading_change_raw[47:16]} * UPDATE_S;
 
     // Scaled velocity components taking into account update
-    wire signed [FIXED_POINT_WIDTH*2-1:0] v_x_scaled_raw = {v_x, 16'h0000} * UPDATE_S;
-    wire signed [FIXED_POINT_WIDTH*2-1:0] v_y_scaled_raw = {v_y, 16'h0000} * UPDATE_S;
-    wire signed [FIXED_POINT_WIDTH*2-1:0] v_z_scaled_raw = {{32{v_z[15]}}, v_z[15:0], 16'h0000} * UPDATE_S;
-    wire signed [COORD_WIDTH-1:0] v_x_scaled = {v_x_scaled_raw[95], v_x_scaled_raw[62:32]};    // drop fractional and most significant parts
-    wire signed [COORD_WIDTH-1:0] v_y_scaled = {v_y_scaled_raw[95], v_y_scaled_raw[62:32]};    // TODO: round instead of trucate
-    wire signed [COORD_WIDTH-1:0] v_z_scaled = v_z_scaled_raw[63:32];
+    wire signed [DATA_WIDTH*2-1:0] v_x_scaled_raw = {{32{v_x[31]}}, v_x[31:0]} * UPDATE_S;
+    wire signed [DATA_WIDTH*2-1:0] v_y_scaled_raw = {{32{v_y[31]}}, v_y[31:0]} * UPDATE_S;
+    wire signed [DATA_WIDTH*2-1:0] v_z_scaled_raw = {{32{v_z[31]}}, v_z[31:0]} * UPDATE_S;
 
     // --- Logic ---
 
@@ -167,27 +169,29 @@ module plane_state #(
         
             case (module_current_state)
                 MODULE_UPDATE_SPRH: begin
-                    speed <= speed + accel_scaled;
-                    pitch <= pitch + pitch_change_scaled;
-                    roll <= roll + roll_change_scaled;
-                    heading <= heading + heading_change_scaled;
+                    speed <= speed + accel_scaled_raw[47:16];
+                    pitch <= pitch + pitch_change_scaled_raw[47:16];
+                    roll <= roll + roll_change_scaled_raw[47:16];
+                    heading <= heading + heading_change_scaled_raw[47:16];
                 end
                 MODULE_WRAP_ANGLES: begin
-                    if (pitch > 'sd180) pitch <= pitch - 'sd180;
-                    else if (pitch < -'sd180) pitch <= pitch + 'sd180;
+                    if (pitch > 'sh00B4_0000) pitch <= pitch - 'sh00B4_0000;            // 00B4_0000 = 180
+                    else if (pitch < -'sh00B4_0000) pitch <= pitch + 'sh00B4_0000;
 
-                    if (roll > 'sd180) roll <= roll - 'sd180;
-                    else if (roll < -'sd180) roll <= roll + 'sd180; 
+                    if (roll > 'sh00B4_0000) roll <= roll - 'sh00B4_0000;
+                    else if (roll < -'sh00B4_0000) roll <= roll + 'sh00B4_0000; 
            
-                    if (heading > 'd360) heading <= heading - 'd360;
+                    if (heading > 'hF000_0000) heading <= heading + 'h0168_0000;
+                    else if (heading > 'h0168_0000) heading <= heading - 'h0168_0000;   // 0168_0000 = 360
                 end
                 MODULE_UPDATE_XYZ: begin
-                    x <= x + v_x_scaled;
-                    y <= y + v_y_scaled;
-                    z <= z + v_z_scaled;
+                    x <= x + v_x_scaled_raw[47:16];
+                    y <= y + v_y_scaled_raw[47:16];
+                    z <= z + v_z_scaled_raw[47:16];
                 end
                 MODULE_UPDATE_PLANE_STATUS: begin
-                    if (y < 'sd2) plane_status <= (speed > 'd25) ? PLANE_CRASHED : PLANE_LANDED;
+                    // 0002_0000 = 2, 000A_0000 = 10
+                    if (y < 'sh0002_0000) plane_status <= (speed > 'sh000A_0000) ? PLANE_CRASHED : PLANE_LANDED;
                 end
             endcase
         end
