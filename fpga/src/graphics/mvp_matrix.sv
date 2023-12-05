@@ -16,6 +16,9 @@ module mvp_matrix(
     reg [31:0] cos_pitch, sin_pitch;
     reg [31:0] cos_yaw, sin_yaw;
 
+    reg [31:0] x_f, y_f, z_f;
+    reg [31:0] speed_f;
+
     reg [31:0] div_in;
     wire [31:0] div_out, int_out;
 
@@ -33,6 +36,8 @@ module mvp_matrix(
     reg [7:0] current_state, next_state;
 
     reg [31:0] float_to_int_in;
+    reg [31:0] int_to_float_in;
+    wire [31:0] int_to_float_out;
 
     localparam
 		S_WAIT              = 8'd0,
@@ -59,7 +64,7 @@ module mvp_matrix(
         S_FORWARD_TO_INT    = 8'd21;
 
     assign count_done =
-        (current_state == S_CALC_TRIG && count == 39) ||
+        (current_state == S_CALC_TRIG && count == 51) ||
         (current_state == S_WAIT_DIV && count == 9) ||
         (current_state == S_FORWARD_TO_INT && count == 8);
     assign done = current_state == S_WAIT;
@@ -72,7 +77,7 @@ module mvp_matrix(
         .aclr(reset),
         .clk_en(1'b1),
         .clock(clock),
-        .data(angle),
+        .data(div_out),
         .result(cos_out)
     );
 
@@ -80,7 +85,7 @@ module mvp_matrix(
         .aclr(reset),
         .clk_en(1'b1),
         .clock(clock),
-        .data(angle),
+        .data(div_out),
         .result(sin_out)
     );
 
@@ -88,8 +93,8 @@ module mvp_matrix(
         .aclr(reset),
         .clk_en(1'b1),
         .clock(clock),
-        .dataa(div_in),
-        .datab(o[3][0]),
+        .dataa(current_state == S_WAIT || current_state == S_CALC_TRIG ? int_to_float_out : div_in),
+        .datab(current_state == S_WAIT || current_state == S_CALC_TRIG ? 32'h42652ee1 : o[3][0]),
         .result(div_out)
     );
 
@@ -97,8 +102,16 @@ module mvp_matrix(
         .aclr(reset),
         .clk_en(1'b1),
         .clock(clock),
-        .dataa(current_state == S_MULT_PROJ_START || current_state == S_FORWARD_TO_INT ? float_to_int_in : div_out),
+        .dataa(current_state == S_MULT_TRANS_START || current_state == S_FORWARD_TO_INT ? float_to_int_in : div_out),
         .result(int_out)
+    );
+
+    int_to_float int_to_float_inst(
+        .aclr(reset),
+        .clk_en(1'b1),
+        .clock(clock),
+        .dataa(int_to_float_in),
+        .result(int_to_float_out)
     );
 
     mat_mult4D matrix_mult_inst(
@@ -121,7 +134,10 @@ module mvp_matrix(
     counter #(6) counter_inst(
 		.clock(clock),
 		.reset(reset || count_done),
-		.enable(current_state == S_CALC_TRIG || current_state == S_WAIT_DIV || current_state == S_FORWARD_TO_INT),
+		.enable(
+            current_state == S_CALC_TRIG ||
+            current_state == S_WAIT_DIV ||
+            current_state == S_FORWARD_TO_INT),
 		.out(count)
 	);
     
@@ -157,19 +173,27 @@ module mvp_matrix(
 		if(reset) current_state <= S_WAIT;
 		else current_state <= next_state;
         case(count)
-            0: angle <= roll;
-            1: angle <= pitch;
-            2: angle <= yaw;
-            36: cos_roll <= cos_out;
-            37: begin
+            0: int_to_float_in <= roll;
+            1: int_to_float_in <= pitch;
+            2: int_to_float_in <= yaw;
+            3: int_to_float_in <= x;
+            4: int_to_float_in <= y;
+            5: int_to_float_in <= z;
+            6: int_to_float_in <= speed;
+            10: x_f <= int_to_float_out;
+            11: y_f <= int_to_float_out;
+            12: z_f <= int_to_float_out;
+            13: speed_f <= int_to_float_out;
+            48: cos_roll <= cos_out;
+            49: begin
                 sin_roll <= sin_out;
                 cos_pitch <= cos_out;
             end
-            38: begin
+            50: begin
                 sin_pitch <= sin_out;
                 cos_yaw <= cos_out;
             end
-            39: sin_yaw <= sin_out;
+            51: sin_yaw <= sin_out;
         endcase
         case(current_state)
             S_CALC_TRIG: mult_vec <= 1'b0;
@@ -197,14 +221,14 @@ module mvp_matrix(
                 m <= o;
                 v[0][0] <= 0;
                 v[1][0] <= 0;
-                v[2][0] <= {~speed[31], speed[30:0]};
+                v[2][0] <= {~speed_f[31], speed_f[30:0]};
                 v[3][0] <= 32'h3f800000;
             end
             S_MULT_TRANS_START: begin
                 mult_vec <= 1'b0;
-                m[0][0] <= 32'h3f800000; m[0][1] <= 0;            m[0][2] <= 0;            m[0][3] <= x;
-                m[1][0] <= 0;            m[1][1] <= 32'h3f800000; m[1][2] <= 0;            m[1][3] <= y;
-                m[2][0] <= 0;            m[2][1] <= 0;            m[2][2] <= 32'h3f800000; m[2][3] <= z;
+                m[0][0] <= 32'h3f800000; m[0][1] <= 0;            m[0][2] <= 0;            m[0][3] <= x_f;
+                m[1][0] <= 0;            m[1][1] <= 32'h3f800000; m[1][2] <= 0;            m[1][3] <= y_f;
+                m[2][0] <= 0;            m[2][1] <= 0;            m[2][2] <= 32'h3f800000; m[2][3] <= z_f;
                 m[3][0] <= 0;            m[3][1] <= 0;            m[3][2] <= 0;            m[3][3] <= 32'h3f800000;
                 v <= m;
                 float_to_int_in <= o[0][0];
