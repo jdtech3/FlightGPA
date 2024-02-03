@@ -5,6 +5,7 @@
 *.qws
 **/db/
 **/incremental_db/
+**/greybox_tmp/
 
 # Quartus output files
 **/output_files/
@@ -19,4 +20,16 @@
 # ModelSim working files
 **/work/
 **/simulation/
+**/*.ver
 vsim.wlf
+
+# Temp files
+*~
+**/greybox_tmp/
+
+# HPS toolchain/generated
+hps/kernel/
+hps/toolchain/
+hps/spl_bsp/generated/
+hps/spl_bsp/uboot-socfpga/
+hps/rootfs/
